@@ -19,10 +19,10 @@ namespace CapstoneProject_BE.Models
                 e.ToTable("User");
                 e.HasKey(u => u.UserId);
                 e.HasOne(u => u.Role)
-                .WithMany(u => u.Users)
-                .HasForeignKey(u => u.RoleId);
-                e.Property(u => u.UserName).IsRequired();
-                e.Property(u => u.Password).IsRequired();
+                .WithMany(u=>u.Users)
+                .HasForeignKey(u=>u.RoleId);
+                e.Property(u => u.Email).IsRequired();
+                e.Property(u=>u.Password).IsRequired();
                 e.Property(u => u.RoleId).HasDefaultValue(0);
                 e.Property(u => u.UserId).UseIdentityColumn();
             });

@@ -1,4 +1,5 @@
 ﻿using CapstoneProject_BE.DTO;
+using CapstoneProject_BE.Helper;
 using CapstoneProject_BE.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -33,8 +34,8 @@ namespace CapstoneProject_BE.Controllers.Authentication
         {
             try
             {
-                var user = await _context.Users.SingleOrDefaultAsync(u => u.UserName == model.Username && u.Password == model.Password);
-                if (user != null)
+                var user = await _context.Users.SingleOrDefaultAsync(u => u.Email == model.Email);
+                if (user!=null&&HashHelper.Decrypt(user.Password,_configuration)==model.Password)
                 {
                     return Ok(GenerateToken(user));
                 }
@@ -47,7 +48,7 @@ namespace CapstoneProject_BE.Controllers.Authentication
             {
                 return StatusCode(500);
             }
-            
+
         }
 
         [HttpGet("Forgot")]
@@ -131,7 +132,7 @@ namespace CapstoneProject_BE.Controllers.Authentication
                 JwtId = tokenhandler.ReadJwtToken(access).Id,
                 ExpiredAt = DateTime.UtcNow.AddMonths(1)
             };
-            if (_context.RefreshTokens.SingleOrDefault(x=>x.UserId==user.UserId)!=null)
+            if (_context.RefreshTokens.SingleOrDefault(x => x.UserId == user.UserId) != null)
             {
                 _context.Update(refreshEntity);
             }
@@ -161,7 +162,7 @@ namespace CapstoneProject_BE.Controllers.Authentication
                     expires: DateTime.UtcNow.AddSeconds(2),
                     signingCredentials: signIn
                 );
-            
+
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
         [HttpPost("RenewToken")]
@@ -177,7 +178,7 @@ namespace CapstoneProject_BE.Controllers.Authentication
                 ValidIssuer = _configuration["Jwt:Issuer"],
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"])),
                 ClockSkew = TimeSpan.Zero,
-                ValidateLifetime=false
+                ValidateLifetime = false
             };
             try
             {
@@ -185,7 +186,7 @@ namespace CapstoneProject_BE.Controllers.Authentication
                 var tokenInVerification = jwtTokenHandler.ValidateToken(tokenmodel.AccessToken
                     , tokenValidateParameter, out var ValidatedToken);
                 //check thuat toan ma hoa accesstoken
-                if(ValidatedToken is JwtSecurityToken jwtSecurityToken)
+                if (ValidatedToken is JwtSecurityToken jwtSecurityToken)
                 {
                     var result = jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256);
                     if (!result)
@@ -195,14 +196,15 @@ namespace CapstoneProject_BE.Controllers.Authentication
                 }
                 var refresh = await _context.RefreshTokens.SingleOrDefaultAsync(rf => rf.Token.Equals(tokenmodel.RefreshToken));
                 //check refresh ton tai ?
-                if ( refresh== null)
+                if (refresh == null)
                 {
                     return BadRequest("Refresh token does not exist");
                 }
-                else if(refresh.IsRevoked)
+                else if (refresh.IsRevoked)
                 {
                     return BadRequest("Refresh token is revoked");
-                }else if (refresh.JwtId != tokenInVerification.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Jti).Value)
+                }
+                else if (refresh.JwtId != tokenInVerification.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Jti).Value)
                 {
                     return BadRequest("Token does not match each other");
                 }
@@ -213,13 +215,13 @@ namespace CapstoneProject_BE.Controllers.Authentication
                 }
                 int uid = Int32.Parse(tokenInVerification.Claims.FirstOrDefault(x => x.Type.Equals("UserId")).Value);
                 var user = await _context.Users.SingleOrDefaultAsync(a => a.UserId == uid);
-                return Ok(GenerateToken(user));          
+                return Ok(GenerateToken(user));
             }
             catch
             {
                 return StatusCode(500);
             }
         }
-        
+
     }
 }
