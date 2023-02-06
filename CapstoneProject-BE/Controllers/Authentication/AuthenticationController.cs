@@ -111,6 +111,32 @@ namespace CapstoneProject_BE.Controllers.Authentication
 
 
         }
+        [HttpPost("RevokeToken")]
+        public async Task<IActionResult> RevokeToken(string token)
+        {
+            try
+            {
+
+                var emailtoken = await _context.EmailTokens.SingleOrDefaultAsync(t => t.Token == token);
+                if (emailtoken != null)
+                {                   
+                    emailtoken.IsRevoked=true;
+                    _context.Update(emailtoken);
+                    await _context.SaveChangesAsync();
+                    return Ok();
+                }
+                else
+                {
+                    return BadRequest("Invalid Token");
+                }
+            }
+            catch
+            {
+                return StatusCode(500);
+            }
+
+
+        }
         [HttpPost("ResetPasswordByEmail")]
         public async Task<IActionResult> ResetPasswordByEmail(string email)
         {
