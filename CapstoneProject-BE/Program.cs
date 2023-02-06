@@ -34,7 +34,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
         };
     });
-
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("Admin", policy =>
+                      policy.RequireClaim("Role", "1"));
+    options.AddPolicy("User", policy =>
+                      policy.RequireClaim("Role", "2"));
+});
 //swagger
 builder.Services.AddSwaggerGen(option =>
 {
