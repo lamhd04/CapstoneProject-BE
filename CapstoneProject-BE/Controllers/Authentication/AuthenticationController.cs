@@ -210,15 +210,6 @@ namespace CapstoneProject_BE.Controllers.Authentication
                     smtp.Credentials = NetworkCred;
                     smtp.Port = 587;
                     smtp.Send(mm);
-                    var emailtoken = new EmailToken
-                    {
-                        Token = token,
-                        IssuedAt = DateTime.UtcNow,
-                        ExpiredAt = DateTime.UtcNow.AddDays(1),
-                        IsRevoked = false,
-                        IsUsed = false,
-                        UserId = user.UserId
-                    };
                     var newuser = new User
                     {
                         Email = model.Email,
@@ -226,6 +217,16 @@ namespace CapstoneProject_BE.Controllers.Authentication
                         RoleId = 1
                     };
                     _context.Users.Add(newuser);
+                    await _context.SaveChangesAsync();
+                    var emailtoken = new EmailToken
+                    {
+                        Token = token,
+                        IssuedAt = DateTime.UtcNow,
+                        ExpiredAt = DateTime.UtcNow.AddDays(1),
+                        IsRevoked = false,
+                        IsUsed = false,
+                        UserId=newuser.UserId
+                    };
                     _context.Add(emailtoken);
                     await _context.SaveChangesAsync();
                     return Ok();
