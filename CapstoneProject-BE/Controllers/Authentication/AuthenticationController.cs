@@ -148,7 +148,8 @@ namespace CapstoneProject_BE.Controllers.Authentication
                     var token = GenerateRandomToken();
                     MailMessage mm = new MailMessage("nguyendailam04@gmail.com", email);
                     mm.Subject = "Reset your password";
-                    mm.Body = Constant.ClientUrl+"/"+token + "/n" +
+                    mm.Body = "<a href='" + Constant.ClientUrl + "/" + token + "'> Reset Password </a>" + "<br>" +
+                        "<a href='" + Constant.ClientUrl + "/" + token + "'> Not you ? </a>" + "<br>" +
                         "This link will be expired in 1 day";
                     mm.IsBodyHtml = true;
                     SmtpClient smtp = new SmtpClient();
@@ -197,7 +198,8 @@ namespace CapstoneProject_BE.Controllers.Authentication
                     var token = GenerateRandomToken();
                     MailMessage mm = new MailMessage("nguyendailam04@gmail.com", model.Email);
                     mm.Subject = "Confirm your email";
-                    mm.Body = Constant.ClientUrl + "/" + token+"/n" +
+                    mm.Body = "<a href='"+Constant.ClientUrl + "/" + token+"'> Confirm email </a>"+"<br>" +
+                        "<a href='" + Constant.ClientUrl + "/" + token + "'> Not you ? </a>" + "<br>" +
                         "This link will be expired in 1 day";
                     mm.IsBodyHtml = true;
                     SmtpClient smtp = new SmtpClient();
