@@ -15,5 +15,4 @@ rules:
 
 -Đặt tên controller theo cú pháp A(s) + Controller vd: ProductsController
 
-quality control:
--Bắt tất cả exception ghi cụ thể loại exception vào log
+

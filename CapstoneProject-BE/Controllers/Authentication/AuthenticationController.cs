@@ -7,9 +7,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
+using MimeKit;
+using MailKit.Security;
+using MailKit.Net.Smtp;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using System.Security.Principal;
 
 namespace CapstoneProject_BE.Controllers.Authentication
 {
@@ -45,6 +50,65 @@ namespace CapstoneProject_BE.Controllers.Authentication
             }
 
         }
+
+        [HttpGet("Forgot")]
+        public async Task<IActionResult> ForgotPassword(TokenModel token)
+        {
+            try
+            {
+                var user = await _context.ForgotPasswordModels.SingleOrDefaultAsync(u => u.Token == token.AccessToken);
+                if (user != null)
+                {
+                    return Ok();
+                }
+                else
+                {
+                    return BadRequest("InvalidCredential");
+                }
+            }
+            catch
+            {
+                return StatusCode(500);
+            }
+        }
+
+        [HttpGet("SendPasswordResetLink/{email}")]
+        public async Task<IActionResult> SendPasswordResetLink(string email)
+        {
+            var user = await _context.Users.SingleOrDefaultAsync(u => u.UserName == email);
+            if (user == null)
+            {
+                return StatusCode(500);
+            }
+            string token = GenerateAccessToken(user);
+            ForgotPasswordModel forgotPasswordModel = new ForgotPasswordModel();
+            forgotPasswordModel.Email = email;
+            forgotPasswordModel.Token = token;
+            string resetLink = "https://localhost:7265/reset-password?token=" + token;
+            var emailToSend = new MimeMessage();
+            emailToSend.From.Add(new MailboxAddress("Sender name", "kiennthe153296@fpt.edu.vn"));
+            emailToSend.To.Add(new MailboxAddress("Receiver name", email));
+            emailToSend.Subject = "Password Reset Request";
+            emailToSend.Body = new TextPart(MimeKit.Text.TextFormat.Html) { Text = $"Dear {user.UserName},\n\n" +
+                               $"We received a request to reset the password for your account. If you made this request, please follow the link below to reset your password:\n\n" +
+                               $"{resetLink}\n\n" +
+                               "If you did not make this request, you can safely ignore this email. Your password will not be reset without clicking on the link above.\n\n" +
+                               "Thank you,\n" +
+                               "IMSD System."
+            };
+            using (var emailClient = new SmtpClient())
+            {
+                emailClient.Connect("smtp.gmail.com", 587, SecureSocketOptions.StartTls);
+                emailClient.Authenticate("kiennthe153296@fpt.edu.vn", "02112001Kien");
+                emailClient.Send(emailToSend);
+                emailClient.Disconnect(true);
+            }
+            forgotPasswordModel.EmailSent = true;
+            await _context.SaveChangesAsync();
+            return Ok(forgotPasswordModel);
+        }
+
+
 
         private string GenerateRefreshToken()
         {
