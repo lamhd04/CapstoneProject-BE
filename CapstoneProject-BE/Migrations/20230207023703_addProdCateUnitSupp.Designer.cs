@@ -4,6 +4,7 @@ using CapstoneProject_BE.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CapstoneProject_BE.Migrations
 {
     [DbContext(typeof(InventoryManagementContext))]
-    partial class InventoryManagementContextModelSnapshot : ModelSnapshot
+    [Migration("20230207023703_addProdCateUnitSupp")]
+    partial class addProdCateUnitSupp
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -112,10 +114,6 @@ namespace CapstoneProject_BE.Migrations
                     b.Property<float>("CostPrice")
                         .HasColumnType("real");
 
-                    b.Property<string>("DefaultMeasuredUnit")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -126,6 +124,10 @@ namespace CapstoneProject_BE.Migrations
 
                     b.Property<int>("InStock")
                         .HasColumnType("int");
+
+                    b.Property<string>("MeasuredUnit")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ProductCode")
                         .IsRequired()
@@ -141,9 +143,6 @@ namespace CapstoneProject_BE.Migrations
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<float>("StockPrice")
-                        .HasColumnType("real");
 
                     b.Property<int>("SupplierId")
                         .HasColumnType("int");
@@ -310,7 +309,7 @@ namespace CapstoneProject_BE.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("CapstoneProject_BE.Models.Supplier", "Supplier")
+                    b.HasOne("CapstoneProject_BE.Models.Supplier", "Suppliers")
                         .WithMany("Products")
                         .HasForeignKey("SupplierId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -318,7 +317,7 @@ namespace CapstoneProject_BE.Migrations
 
                     b.Navigation("Category");
 
-                    b.Navigation("Supplier");
+                    b.Navigation("Suppliers");
                 });
 
             modelBuilder.Entity("CapstoneProject_BE.Models.RefreshToken", b =>

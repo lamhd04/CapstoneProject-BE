@@ -12,6 +12,10 @@ namespace CapstoneProject_BE.Models
         public DbSet<Role> Roles { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
         public DbSet<EmailToken> EmailTokens { get; set; }
+        public DbSet<Product> Products { get; set; }
+        public DbSet<Category> Categories { get; set; }
+        public DbSet<Supplier> Suppliers { get; set; }
+        public DbSet<MeasuredUnit> MeasuredUnits { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>(e =>
@@ -53,6 +57,46 @@ namespace CapstoneProject_BE.Models
                 .HasForeignKey(u => u.UserId);
                 e.Property(u => u.Token).IsRequired();
                 e.Property(u => u.TokenId).UseIdentityColumn();
+            });
+            modelBuilder.Entity<Category>(e =>
+            {
+                e.ToTable("Category");
+                e.HasKey(r => r.CategoryId);
+                e.Property(u => u.CategoryName).IsRequired();
+                e.Property(u => u.CategoryId).UseIdentityColumn();
+            });
+            modelBuilder.Entity<Supplier>(e =>
+            {
+                e.ToTable("Supplier");
+                e.HasKey(r => r.SupplierId);
+                e.Property(u => u.SupplierName).IsRequired();
+                e.Property(u => u.SupplierId).UseIdentityColumn();
+            });
+            modelBuilder.Entity<MeasuredUnit>(e =>
+            {
+                e.ToTable("MeasuredUnit");
+                e.HasKey(r => r.MeasuredUnitId);
+                e.Property(u => u.MeasuredUnitName).IsRequired();
+                e.Property(u => u.MeasuredUnitValue).IsRequired();
+                e.Property(u => u.MeasuredUnitId).UseIdentityColumn();
+            });
+            modelBuilder.Entity<Product>(e =>
+            {
+                e.ToTable("Product");
+                e.HasKey(r => r.ProductId);
+                e.HasOne(t => t.Category)
+                .WithMany(a => a.Products)
+                .HasForeignKey(u => u.CategoryId);
+                e.HasOne(t => t.Supplier)
+                .WithMany(a => a.Products)
+                .HasForeignKey(u => u.SupplierId);
+                e.HasMany(t => t.MeasuredUnits)
+                .WithOne(t => t.Product)
+                .HasForeignKey(t => t.ProductId);
+                e.Property(u => u.ProductCode).IsRequired();
+                e.Property(u => u.ProductName).IsRequired();
+                e.Property(u => u.DefaultMeasuredUnit).IsRequired();
+                e.Property(u => u.ProductId).UseIdentityColumn();
             });
         }
     }

@@ -215,7 +215,7 @@ namespace CapstoneProject_BE.Controllers.Authentication
                     var newuser = new User
                     {
                         Email = model.Email,
-                        Password = model.Password,
+                        Password = HashHelper.Encrypt(model.Password,_configuration),
                         RoleId = 1
                     };
                     _context.Users.Add(newuser);
