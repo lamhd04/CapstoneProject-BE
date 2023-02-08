@@ -58,9 +58,9 @@ namespace CapstoneProject_BE.Controllers.Authentication
         {
             try
             {
-                Regex validateGuidRegex = new Regex("^(?=.*?[A-Z])(?=.*?[0-9]).{6,32}$");
+                
                 var emailtoken = await _context.EmailTokens.SingleOrDefaultAsync(t => t.Token == token);
-                if (emailtoken != null && !emailtoken.IsUsed && !emailtoken.IsRevoked&&validateGuidRegex.IsMatch(newpwd))
+                if (emailtoken != null && !emailtoken.IsUsed && !emailtoken.IsRevoked&&Constant.validateGuidRegex.IsMatch(newpwd))
                 {
                     var user = await _context.Users.SingleOrDefaultAsync(t => t.UserId == emailtoken.UserId);
                     user.Password = HashHelper.Encrypt(newpwd,_configuration);
@@ -111,6 +111,17 @@ namespace CapstoneProject_BE.Controllers.Authentication
 
 
         }
+        private string GenerateRandomToken(int length)
+        {
+            using (var crypto = new RNGCryptoServiceProvider())
+            {
+                var bits = (length * 6);
+                var byte_size = ((bits + 7) / 8);
+                var bytesarray = new byte[byte_size];
+                crypto.GetBytes(bytesarray);
+                return Convert.ToBase64String(bytesarray);
+            }
+        }
         [HttpPost("RevokeToken")]
         public async Task<IActionResult> RevokeToken(string token)
         {
@@ -145,7 +156,7 @@ namespace CapstoneProject_BE.Controllers.Authentication
                 var user = await _context.Users.SingleOrDefaultAsync(u => u.Email == email);
                 if (user != null)
                 {
-                    var token = GenerateRandomToken();
+                    var token = GenerateRandomToken(24);
                     MailMessage mm = new MailMessage("nguyendailam04@gmail.com", email);
                     mm.Subject = "Reset your password";
                     mm.Body = "<a href='" + Constant.ClientUrl + "/" + token + "'> Reset Password </a>" + "<br>" +
@@ -191,11 +202,11 @@ namespace CapstoneProject_BE.Controllers.Authentication
         {
             try
             {
-                Regex validateGuidRegex = new Regex("^(?=.*?[A-Z])(?=.*?[0-9]).{6,32}$");
+                
                 var user = await _context.Users.SingleOrDefaultAsync(u => u.Email == model.Email);
-                if (user == null&&validateGuidRegex.IsMatch(model.Password))
+                if (user == null&& Constant.validateGuidRegex.IsMatch(model.Password))
                 {
-                    var token = GenerateRandomToken();
+                    var token = GenerateRandomToken(24);
                     MailMessage mm = new MailMessage("nguyendailam04@gmail.com", model.Email);
                     mm.Subject = "Confirm your email";
                     mm.Body = "<a href='"+Constant.ClientUrl + "/" + token+"'> Confirm email </a>"+"<br>" +
