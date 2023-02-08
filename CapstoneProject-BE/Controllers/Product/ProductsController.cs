@@ -90,14 +90,8 @@ namespace CapstoneProject_BE.Controllers.Product
                 
                 if (p != null)
                 {
-                    _context.Add(p);
-                    await _context.SaveChangesAsync();
-                    foreach(var a in p.MeasuredUnits)
-                    {
-                        a.ProductId = p.ProductId;
-                    }
-                    var b=mapper.Map<List<MeasuredUnit>>(p.MeasuredUnits);
-                    _context.AddRange(b);
+                    var c = mapper.Map<Models.Product>(p);
+                    _context.Add(c);
                     await _context.SaveChangesAsync();
                     return Ok("Thành công");
 

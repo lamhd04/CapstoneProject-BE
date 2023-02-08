@@ -8,7 +8,6 @@ namespace CapstoneProject_BE.AutoMapper
     {
         public MappingProfile()
         {
-            CreateMap<Product, ProductDTO>();
             CreateMap<ProductDTO, Product>();
             CreateMap<MeasuredUnitDTO, MeasuredUnit>();
         }
