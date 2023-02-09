@@ -153,7 +153,7 @@ namespace CapstoneProject_BE.Controllers.Authentication
                 var user = await _context.Users.SingleOrDefaultAsync(u => u.Email == email);
                 if (user != null)
                 {
-                    var token = GenerateRandomToken(24);
+                    var token = GenerateRandomToken(64);
                     MailMessage mm = new MailMessage("nguyendailam04@gmail.com", email);
                     mm.Subject = "Reset your password";
                     mm.Body = "<a href='" + Constant.ClientUrl + "/" + token + "'> Reset Password </a>" + "<br>" +
@@ -203,7 +203,7 @@ namespace CapstoneProject_BE.Controllers.Authentication
                 var user = await _context.Users.SingleOrDefaultAsync(u => u.Email == model.Email);
                 if (user == null&& Constant.validateGuidRegex.IsMatch(model.Password))
                 {
-                    var token = GenerateRandomToken(24);
+                    var token = GenerateRandomToken(64);
                     MailMessage mm = new MailMessage("nguyendailam04@gmail.com", model.Email);
                     mm.Subject = "Confirm your email";
                     mm.Body = "<a href='"+Constant.ClientUrl + "/" + token+"'> Confirm email </a>"+"<br>" +
