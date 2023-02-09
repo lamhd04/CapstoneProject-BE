@@ -25,13 +25,13 @@ namespace CapstoneProject_BE.Controllers.Product
             this.mapper = config.CreateMapper();
         }
         [HttpGet("Get")]
-        public async Task<IActionResult> Get(int offset, int limit,int? catId,int? supId, string? search = "")
+        public async Task<IActionResult> Get(int offset, int limit,int? catId=0,int? supId=0, string? search = "")
         {
             try
             {
                 var result = _context.Products.Include(x=>x.Supplier).Include(x=>x.Category)
                     .Where(x => x.ProductCode.Contains(search)|| x.ProductName.Contains(search)
-                || x.CategoryId == catId || x.SupplierId == supId);
+                && x.CategoryId == catId || catId==0 && x.SupplierId == supId || supId==0);
                 if (limit > result.Count()&&offset>=0)
                 {
                    return Ok(new ProductList { Data= result.Skip(offset).Take(result.Count()).ToList(),
@@ -91,6 +91,7 @@ namespace CapstoneProject_BE.Controllers.Product
                 if (p != null)
                 {
                     var c = mapper.Map<Models.Product>(p);
+                    c.Created=DateTime.UtcNow;
                     _context.Add(c);
                     await _context.SaveChangesAsync();
                     return Ok("Thành công");
