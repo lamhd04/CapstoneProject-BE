@@ -30,8 +30,8 @@ namespace CapstoneProject_BE.Controllers.Product
             try
             {
                 var result = _context.Products.Include(x=>x.Supplier).Include(x=>x.Category)
-                    .Where(x => x.ProductCode.Contains(search)|| x.ProductName.Contains(search)
-                && x.CategoryId == catId || catId==0 && x.SupplierId == supId || supId==0);
+                    .Where(x => (x.ProductCode.Contains(search) || x.ProductName.Contains(search))
+                && (x.CategoryId == catId || catId==0) && (x.SupplierId == supId || supId==0));
                 if (limit > result.Count()&&offset>=0)
                 {
                    return Ok(new ProductList { Data= result.Skip(offset).Take(result.Count()).ToList(),
