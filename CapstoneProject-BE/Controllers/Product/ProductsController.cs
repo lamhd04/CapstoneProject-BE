@@ -92,6 +92,7 @@ namespace CapstoneProject_BE.Controllers.Product
                 {
                     var c = mapper.Map<Models.Product>(p);
                     c.Created=DateTime.UtcNow;
+                    c.ProductCode = GenerateProductCode();
                     _context.Add(c);
                     await _context.SaveChangesAsync();
                     return Ok("Thành công");
@@ -107,6 +108,11 @@ namespace CapstoneProject_BE.Controllers.Product
                 return StatusCode(500);
             }
 
+        }
+        private string GenerateProductCode()
+        {
+            var result = "SP" + _context.Products.Count();
+            return result;
         }
     }
 }
