@@ -18,6 +18,7 @@ using System.Text.RegularExpressions;
 using Org.BouncyCastle.Utilities;
 using System.Net.Mail;
 using CapstoneProject_BE.Constants;
+using System;
 
 namespace CapstoneProject_BE.Controllers.Authentication
 {
@@ -111,16 +112,12 @@ namespace CapstoneProject_BE.Controllers.Authentication
 
 
         }
-        private string GenerateRandomToken(int length)
+        public static string GenerateRandomToken(int length)
         {
-            using (var crypto = new RNGCryptoServiceProvider())
-            {
-                var bits = (length * 6);
-                var byte_size = ((bits + 7) / 8);
-                var bytesarray = new byte[byte_size];
-                crypto.GetBytes(bytesarray);
-                return Convert.ToBase64String(bytesarray);
-            }
+            Random random = new Random();
+            const string characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            return new string(Enumerable.Repeat(characters, length)
+              .Select(s => s[random.Next(s.Length)]).ToArray());
         }
         [HttpPost("RevokeToken")]
         public async Task<IActionResult> RevokeToken(string token)
