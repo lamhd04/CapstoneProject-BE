@@ -93,8 +93,6 @@ namespace CapstoneProject_BE.Models
                 e.HasMany(t => t.MeasuredUnits)
                 .WithOne(t => t.Product)
                 .HasForeignKey(t => t.ProductId);
-                e.Property(u => u.CategoryId).IsRequired();
-                e.Property(u => u.SupplierId).IsRequired();
                 e.Property(u => u.ProductId).UseIdentityColumn();
             });
         }
