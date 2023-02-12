@@ -62,6 +62,9 @@ namespace CapstoneProject_BE.Models
             {
                 e.ToTable("Category");
                 e.HasKey(r => r.CategoryId);
+                e.HasMany(r => r.Products)
+                .WithOne(r => r.Category)
+                .HasForeignKey(r => r.CategoryId);
                 e.Property(u => u.CategoryName).IsRequired();
                 e.Property(u => u.CategoryId).UseIdentityColumn();
             });
@@ -70,6 +73,10 @@ namespace CapstoneProject_BE.Models
                 e.ToTable("Supplier");
                 e.HasKey(r => r.SupplierId);
                 e.Property(u => u.SupplierName).IsRequired();
+                e.Property(u => u.SupplierPhone).IsRequired();
+                e.Property(u => u.Province).IsRequired();
+                e.Property(u => u.City).IsRequired();
+                e.Property(u => u.Block).IsRequired();
                 e.Property(u => u.SupplierId).UseIdentityColumn();
             });
             modelBuilder.Entity<MeasuredUnit>(e =>
@@ -84,9 +91,6 @@ namespace CapstoneProject_BE.Models
             {
                 e.ToTable("Product");
                 e.HasKey(r => r.ProductId);
-                e.HasOne(t => t.Category)
-                .WithMany(a => a.Products)
-                .HasForeignKey(u => u.CategoryId);
                 e.HasOne(t => t.Supplier)
                 .WithMany(a => a.Products)
                 .HasForeignKey(u => u.SupplierId);

@@ -1,4 +1,5 @@
 ﻿
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 namespace CapstoneProject_BE.Models
@@ -7,11 +8,16 @@ namespace CapstoneProject_BE.Models
     {
         public int SupplierId { get; set; }
         public string SupplierName { get; set; }
+        [DataType(DataType.PhoneNumber)]
         public string SupplierPhone { get; set; }
         public bool Status { get; set; }
-        public string SupplierAddress { get; set; }
+        public string Province { get; set; }
+        public string City { get; set; }
+        public string Block { get; set; }
+        public string? Note { get; set; }
+        [DataType(DataType.EmailAddress)]
         public string SupplierEmail { get; set; }
         [JsonIgnore]
-        public ICollection<Product> Products { get; set; }
+        public ICollection<Product>? Products { get; set; }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using CapstoneProject_BE.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace CapstoneProject_BE.DTO
 {
@@ -15,6 +16,7 @@ namespace CapstoneProject_BE.DTO
         public string? DefaultMeasuredUnit { get; set; }
         public int? InStock { get; set; }
         public float? StockPrice { get; set; }
+        [DataType(DataType.ImageUrl)]
         public string? Image { get; set; }
         public bool? Status { get; set; }
         public List<MeasuredUnitDTO>? MeasuredUnits { get; set; }

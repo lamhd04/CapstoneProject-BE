@@ -76,7 +76,7 @@ app.UseCors(option => option.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader())
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c => c.SwaggerEndpoint("../swagger/v1/swagger.json", "imsdAPI v1"));
 }
 
 app.UseHttpsRedirection();

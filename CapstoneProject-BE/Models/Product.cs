@@ -1,4 +1,6 @@
-﻿namespace CapstoneProject_BE.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace CapstoneProject_BE.Models
 {
     public class Product
     {
@@ -13,6 +15,7 @@
         public string? DefaultMeasuredUnit { get; set; }
         public int? InStock { get; set; }
         public float? StockPrice { get; set; }
+        
         public string? Image { get; set; }
         public DateTime Created { get; set; }
         public bool? Status { get; set; }

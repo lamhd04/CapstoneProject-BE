@@ -115,7 +115,7 @@ namespace CapstoneProject_BE.Controllers.Authentication
         public static string GenerateRandomToken(int length)
         {
             Random random = new Random();
-            const string characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            const string characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
             return new string(Enumerable.Repeat(characters, length)
               .Select(s => s[random.Next(s.Length)]).ToArray());
         }
@@ -155,10 +155,11 @@ namespace CapstoneProject_BE.Controllers.Authentication
                 {
                     var token = GenerateRandomToken(64);
                     string url = Constant.ClientUrl+"/set-password?token=" + token;
+                    string urlNotMe = Constant.ClientUrl + "/not-me?token=" + token;
                     MailMessage mm = new MailMessage("nguyendailam04@gmail.com", email);
                     mm.Subject = "Reset your password";
                     mm.Body = "<a href='" + url + "'> Reset Password </a>" + "<br>" +
-                        "<a href='" + url + "'> Not you ? </a>" + "<br>" +
+                        "<a href='" + urlNotMe + "'> Not you ? </a>" + "<br>" +
                         "This link will be expired in 1 day";
                     mm.IsBodyHtml = true;
                     SmtpClient smtp = new SmtpClient();
@@ -207,9 +208,10 @@ namespace CapstoneProject_BE.Controllers.Authentication
                     var token = GenerateRandomToken(64);
                     MailMessage mm = new MailMessage("nguyendailam04@gmail.com", model.Email);
                     string url = Constant.ClientUrl + "/verification-success?token=" + token;
+                    string urlNotMe = Constant.ClientUrl + "/not-me?token=" + token;
                     mm.Subject = "Confirm your email";
                     mm.Body = "<a href='" + url + "'> Confirm email </a>" + "<br>" +
-                        "<a href='" + url + "'> Not you ? </a>" + "<br>" +
+                        "<a href='" + urlNotMe + "'> Not you ? </a>" + "<br>" +
                         "This link will be expired in 1 day";
                     mm.IsBodyHtml = true;
                     SmtpClient smtp = new SmtpClient();

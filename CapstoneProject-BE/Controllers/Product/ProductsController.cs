@@ -121,7 +121,7 @@ namespace CapstoneProject_BE.Controllers.Product
                 var editProduct = await _context.Products.SingleOrDefaultAsync(x => x.ProductId == productDTO.ProductId);
                 if (editProduct != null)
                 {
-                    _context.ChangeTracker.Clear();
+                    _context.Entry(editProduct).State = EntityState.Detached;
                     var result=mapper.Map<Models.Product>(productDTO);
                     result.Created = editProduct.Created;
                     if (result.ProductCode == "")
