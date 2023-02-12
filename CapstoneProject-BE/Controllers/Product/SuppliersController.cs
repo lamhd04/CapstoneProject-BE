@@ -1,4 +1,5 @@
-﻿using CapstoneProject_BE.Models;
+﻿using CapstoneProject_BE.DTO;
+using CapstoneProject_BE.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -79,6 +80,45 @@ namespace CapstoneProject_BE.Controllers.Product
                 else
                 {
                     return BadRequest("Không có dữ liệu");
+                }
+            }
+            catch
+            {
+                return StatusCode(500);
+            }
+
+        }
+        [HttpGet("Get")]
+        public async Task<IActionResult> Get(int offset, int limit, string? search = "")
+        {
+            try
+            {
+                var result = await _context.Suppliers
+                    .Where(x => x.SupplierName.Contains(search)
+                ).ToListAsync();
+                if (limit > result.Count() && offset >= 0)
+                {
+                    return Ok(new ResponseData<Supplier>
+                    {
+                        Data = result.Skip(offset).Take(result.Count()).ToList(),
+                        Offset = offset,
+                        Limit = limit,
+                        Total = result.Count()
+                    });
+                }
+                else if (offset >= 0)
+                {
+                    return Ok(new ResponseData<Supplier>
+                    {
+                        Data = result.Skip(offset).Take(limit).ToList(),
+                        Offset = offset,
+                        Limit = limit,
+                        Total = result.Count()
+                    });
+                }
+                else
+                {
+                    return NotFound("Không kết quả");
                 }
             }
             catch

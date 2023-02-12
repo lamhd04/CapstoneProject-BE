@@ -88,5 +88,44 @@ namespace CapstoneProject_BE.Controllers.Product
             }
 
         }
+        [HttpGet("Get")]
+        public async Task<IActionResult> Get(int offset, int limit, string? search = "")
+        {
+            try
+            {
+                var result = await _context.Categories
+                    .Where(x =>x.CategoryName.Contains(search)
+                ).ToListAsync();
+                if (limit > result.Count() && offset >= 0)
+                {
+                    return Ok(new ResponseData<Category>
+                    {
+                        Data = result.Skip(offset).Take(result.Count()).ToList(),
+                        Offset = offset,
+                        Limit = limit,
+                        Total = result.Count()
+                    });
+                }
+                else if (offset >= 0)
+                {
+                    return Ok(new ResponseData<Category>
+                    {
+                        Data = result.Skip(offset).Take(limit).ToList(),
+                        Offset = offset,
+                        Limit = limit,
+                        Total = result.Count()
+                    });
+                }
+                else
+                {
+                    return NotFound("Không kết quả");
+                }
+            }
+            catch
+            {
+                return StatusCode(500);
+            }
+
+        }
     }
 }

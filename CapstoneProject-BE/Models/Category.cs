@@ -6,6 +6,7 @@ namespace CapstoneProject_BE.Models
     {
         public int CategoryId { get; set; }
         public string CategoryName { get; set; }
+        public string Description { get; set; } 
         [JsonIgnore]
         public ICollection<Product>? Products { get; set; }
     }

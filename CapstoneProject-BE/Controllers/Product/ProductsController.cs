@@ -37,7 +37,7 @@ namespace CapstoneProject_BE.Controllers.Product
                 && (x.CategoryId == catId || catId == 0) && (x.SupplierId == supId || supId == 0)).ToListAsync();
                 if (limit > result.Count() && offset >= 0)
                 {
-                    return Ok(new ProductList
+                    return Ok(new ResponseData<Models.Product>
                     {
                         Data = result.Skip(offset).Take(result.Count()).ToList(),
                         Offset = offset,
@@ -47,7 +47,7 @@ namespace CapstoneProject_BE.Controllers.Product
                 }
                 else if (offset >= 0)
                 {
-                    return Ok(new ProductList
+                    return Ok(new ResponseData<Models.Product>
                     {
                         Data = result.Skip(offset).Take(limit).ToList(),
                         Offset = offset,
