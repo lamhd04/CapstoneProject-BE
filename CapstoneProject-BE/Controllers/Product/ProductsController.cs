@@ -157,9 +157,9 @@ namespace CapstoneProject_BE.Controllers.Product
 
                 int rowCount = worksheet.RowCount;
                 int colCount = worksheet.ColumnCount;
-                for (int row = 1; row <= rowCount; row++)
+                for (int row = 2; row <= rowCount; row++)
                 {
-                    foreach (var cell in worksheet["A1:A10"])
+                    for (int col = 1; col <= colCount; col++)
                     {
                         ProductDTO p = new ProductDTO();
                         var c = mapper.Map<Models.Product>(p);
