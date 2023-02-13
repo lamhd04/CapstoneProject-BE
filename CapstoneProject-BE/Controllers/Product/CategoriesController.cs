@@ -73,6 +73,7 @@ namespace CapstoneProject_BE.Controllers.Product
                 if (editProduct != null)
                 {
                     editProduct.CategoryName = c.CategoryName;
+                    editProduct.Description = c.Description;
                     await _context.SaveChangesAsync();
                     return Ok("Thành công");
 
