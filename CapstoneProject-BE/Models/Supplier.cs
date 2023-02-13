@@ -11,9 +11,10 @@ namespace CapstoneProject_BE.Models
         [DataType(DataType.PhoneNumber)]
         public string SupplierPhone { get; set; }
         public bool Status { get; set; }
-        public string Province { get; set; }
         public string City { get; set; }
-        public string Block { get; set; }
+        public string District { get; set; }
+        public string Ward { get; set; }
+        public string Address { get; set; }
         public string? Note { get; set; }
         [DataType(DataType.EmailAddress)]
         public string SupplierEmail { get; set; }

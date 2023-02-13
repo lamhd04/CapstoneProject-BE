@@ -74,9 +74,10 @@ namespace CapstoneProject_BE.Models
                 e.HasKey(r => r.SupplierId);
                 e.Property(u => u.SupplierName).IsRequired();
                 e.Property(u => u.SupplierPhone).IsRequired();
-                e.Property(u => u.Province).IsRequired();
+                e.Property(u => u.Ward).IsRequired();
                 e.Property(u => u.City).IsRequired();
-                e.Property(u => u.Block).IsRequired();
+                e.Property(u => u.Address).IsRequired();
+                e.Property(u => u.District).IsRequired();
                 e.Property(u => u.SupplierId).UseIdentityColumn();
             });
             modelBuilder.Entity<MeasuredUnit>(e =>
