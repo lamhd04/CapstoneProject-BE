@@ -127,5 +127,26 @@ namespace CapstoneProject_BE.Controllers.Product
             }
 
         }
+        [HttpGet("GetDetail")]
+        public async Task<IActionResult> GetDetail(int catId)
+        {
+            try
+            {
+                var result = await _context.Categories.SingleOrDefaultAsync(x => x.CategoryId == catId);
+                if (result != null)
+                {
+                    return Ok(result);
+
+                }
+                else
+                {
+                    return NotFound("sản phẩm không tồn tại");
+                }
+            }
+            catch
+            {
+                return StatusCode(500);
+            }
+        }
     }
 }

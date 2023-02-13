@@ -147,22 +147,22 @@ namespace CapstoneProject_BE.Controllers.Product
         }
 
         [HttpPost("ImportExcelFile")]
-        public async Task<IActionResult> ImportExcelFile(string fileName)
+        public async Task<IActionResult> ImportExcelFile(IFormFile file)
         {
-            try
+            using (var stream = file.OpenReadStream())
             {
-                string filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", fileName);
-                WorkBook workbook = WorkBook.Load(filePath);
-                WorkSheet worksheet = workbook.WorkSheets.First();
+                WorkBook workbook = WorkBook.Load(stream);
+                WorkSheet worksheet = workbook.DefaultWorkSheet;
 
                 int rowCount = worksheet.RowCount;
                 int colCount = worksheet.ColumnCount;
                 for (int row = 2; row <= rowCount; row++)
                 {
+
+                    ProductDTO p = new ProductDTO();
+                    var c = mapper.Map<Models.Product>(p);
                     for (int col = 1; col <= colCount; col++)
                     {
-                        ProductDTO p = new ProductDTO();
-                        var c = mapper.Map<Models.Product>(p);
                         c.ProductCode = worksheet["A" + row].ToString();
                         c.ProductName = worksheet["B" + row].ToString();
                         c.CategoryId = Convert.ToInt32(worksheet["C" + row].ToString());
@@ -176,15 +176,11 @@ namespace CapstoneProject_BE.Controllers.Product
                         c.Image = worksheet["K" + row].ToString();
                         c.Created = DateTime.UtcNow;
                         c.Status = Convert.ToBoolean(worksheet["L" + row].ToString());
-                        _context.Add(c);
-                        await _context.SaveChangesAsync();
                     }
+                    _context.Add(c);
+                    await _context.SaveChangesAsync();
                 }
                 return Ok("Thành công");
-            }
-            catch
-            {
-                return StatusCode(500);
             }
         }
         private string GenerateProductCode(int proid)
