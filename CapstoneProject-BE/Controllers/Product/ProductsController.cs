@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System.Drawing;
 using System.Text.Json;
+using IronXL;
 
 namespace CapstoneProject_BE.Controllers.Product
 {
@@ -145,7 +146,47 @@ namespace CapstoneProject_BE.Controllers.Product
 
         }
 
-       
+        [HttpPost("ImportExcelFile")]
+        public async Task<IActionResult> ImportExcelFile(string fileName)
+        {
+            try
+            {
+                string filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", fileName);
+                WorkBook workbook = WorkBook.Load(filePath);
+                WorkSheet worksheet = workbook.WorkSheets.First();
+
+                int rowCount = worksheet.RowCount;
+                int colCount = worksheet.ColumnCount;
+                for (int row = 1; row <= rowCount; row++)
+                {
+                    foreach (var cell in worksheet["A1:A10"])
+                    {
+                        ProductDTO p = new ProductDTO();
+                        var c = mapper.Map<Models.Product>(p);
+                        c.ProductCode = worksheet["A" + row].ToString();
+                        c.ProductName = worksheet["B" + row].ToString();
+                        c.CategoryId = Convert.ToInt32(worksheet["C" + row].ToString());
+                        c.Description = worksheet["D" + row].ToString();
+                        c.SupplierId = Convert.ToInt32(worksheet["E" + row].ToString());
+                        c.CostPrice = Convert.ToSingle(worksheet["F" + row].ToString());
+                        c.SellingPrice = Convert.ToSingle(worksheet["G" + row].ToString());
+                        c.DefaultMeasuredUnit = worksheet["H" + row].ToString();
+                        c.InStock = Convert.ToInt32(worksheet["I" + row].ToString());
+                        c.StockPrice = Convert.ToSingle(worksheet["J" + row].ToString());
+                        c.Image = worksheet["K" + row].ToString();
+                        c.Created = DateTime.UtcNow;
+                        c.Status = Convert.ToBoolean(worksheet["L" + row].ToString());
+                        _context.Add(c);
+                        await _context.SaveChangesAsync();
+                    }
+                }
+                return Ok("Thành công");
+            }
+            catch
+            {
+                return StatusCode(500);
+            }
+        }
         private string GenerateProductCode(int proid)
         {
             var result = "SP" + proid;
