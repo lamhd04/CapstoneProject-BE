@@ -1,8 +1,12 @@
-﻿using CapstoneProject_BE.DTO;
+﻿using AutoMapper;
+using BitMiracle.LibTiff.Classic;
+using CapstoneProject_BE.AutoMapper;
+using CapstoneProject_BE.DTO;
 using CapstoneProject_BE.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 
 namespace CapstoneProject_BE.Controllers.Product
 {
@@ -12,10 +16,13 @@ namespace CapstoneProject_BE.Controllers.Product
     {
         public IConfiguration _configuration;
         private readonly InventoryManagementContext _context;
+        public IMapper mapper;
         public SuppliersController(InventoryManagementContext context, IConfiguration configuration)
         {
             _context = context;
             _configuration = configuration;
+            var config = new MapperConfiguration(cfg => cfg.AddProfile(new MappingProfile()));
+            this.mapper = config.CreateMapper();
         }
         [HttpDelete("Delete")]
         public async Task<IActionResult> Delete(int supId)
@@ -41,14 +48,16 @@ namespace CapstoneProject_BE.Controllers.Product
             }
         }
         [HttpPost("PostSupplier")]
-        public async Task<IActionResult> PostSupplier(Supplier s)
+        public async Task<IActionResult> PostSupplier(SupplierDTO s)
         {
             try
             {
-
                 if (s != null)
                 {
-                    _context.Add(s);
+                    var result=mapper.Map<Supplier>(s);
+                    result.City = JsonSerializer.Serialize(s.City);
+                    result.District = JsonSerializer.Serialize(s.District);
+                    _context.Add(result);
                     await _context.SaveChangesAsync();
                     return Ok("Thành công");
 
@@ -64,14 +73,17 @@ namespace CapstoneProject_BE.Controllers.Product
             }
         }
         [HttpPut("PutSupplier")]
-        public async Task<IActionResult> PutSupplier(Supplier s)
+        public async Task<IActionResult> PutSupplier(SupplierDTO s)
         {
             try
             {
-                var editProduct = await _context.Suppliers.SingleOrDefaultAsync(x => x.SupplierId == s.SupplierId);
-                if (editProduct != null)
+                var editSupplier = await _context.Suppliers.SingleOrDefaultAsync(x => x.SupplierId == s.SupplierId);
+                if (editSupplier != null)
                 {
-                    _context.Entry(editProduct).State = EntityState.Detached;
+                    _context.Entry(editSupplier).State = EntityState.Detached;
+                    editSupplier=mapper.Map<Supplier>(s);
+                    editSupplier.City = JsonSerializer.Serialize(s.City);
+                    editSupplier.District = JsonSerializer.Serialize(s.District);
                     _context.Update(s);
                     await _context.SaveChangesAsync();
                     return Ok("Thành công");
@@ -132,11 +144,13 @@ namespace CapstoneProject_BE.Controllers.Product
         {
             try
             {
-                var result = await _context.Suppliers.SingleOrDefaultAsync(x => x.SupplierId == supId);
-                if (result != null)
+                var supplier = await _context.Suppliers.SingleOrDefaultAsync(x => x.SupplierId == supId);
+                if (supplier != null)
                 {
+                    var result = mapper.Map<SupplierDTO>(supplier);
+                    result.City = JsonSerializer.Deserialize<City>(supplier.City);
+                    result.District= JsonSerializer.Deserialize<District>(supplier.District);
                     return Ok(result);
-
                 }
                 else
                 {

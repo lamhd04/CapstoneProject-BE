@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using CapstoneProject_BE.DTO;
 using CapstoneProject_BE.Models;
+using System.Text.Json;
 
 namespace CapstoneProject_BE.AutoMapper
 {
@@ -10,7 +11,10 @@ namespace CapstoneProject_BE.AutoMapper
         {
             CreateMap<ProductDTO, Product>();
             CreateMap<MeasuredUnitDTO, MeasuredUnit>();
+            CreateMap<SupplierDTO, Supplier>();
+            CreateMap<Supplier, SupplierDTO>();
         }
-        
     }
+        
+    
 }

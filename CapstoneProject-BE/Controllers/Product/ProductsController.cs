@@ -34,7 +34,7 @@ namespace CapstoneProject_BE.Controllers.Product
             try
             {
                 var result = await _context.Products.Include(x => x.Supplier).Include(x => x.Category)
-                    .Where(x => (x.ProductCode.Contains(search) || x.ProductName.Contains(search))
+                    .Where(x => (x.ProductCode.Contains(search) || x.ProductName.Contains(search) || x.Barcode.Contains(search))
                 && (x.CategoryId == catId || catId == 0) && (x.SupplierId == supId || supId == 0)).ToListAsync();
                 if (limit > result.Count() && offset >= 0)
                 {
@@ -68,11 +68,13 @@ namespace CapstoneProject_BE.Controllers.Product
 
         }
         [HttpGet("GetDetail")]
-        public async Task<IActionResult> GetDetail(int prodId)
+        public async Task<IActionResult> GetDetail(int prodId,string? barcode="")
         {
             try
             {
-                var result = await _context.Products.Include(x => x.Supplier).Include(x => x.MeasuredUnits).Include(x => x.Category).SingleOrDefaultAsync(x => x.ProductId == prodId);
+                var result = await _context.Products.Include(x => x.Supplier)
+                    .Include(x => x.MeasuredUnits).Include(x => x.Category)
+                    .SingleOrDefaultAsync(x => x.ProductId == prodId&&(x.Barcode==barcode||x.Barcode==""));
                 if (result != null)
                 {
                     return Ok(result);
