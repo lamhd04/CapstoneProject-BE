@@ -112,13 +112,7 @@ namespace CapstoneProject_BE.Controllers.Authentication
 
 
         }
-        public static string GenerateRandomToken(int length)
-        {
-            Random random = new Random();
-            const string characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-            return new string(Enumerable.Repeat(characters, length)
-              .Select(s => s[random.Next(s.Length)]).ToArray());
-        }
+
         [HttpPost("RevokeToken")]
         public async Task<IActionResult> RevokeToken(string token)
         {
@@ -153,7 +147,7 @@ namespace CapstoneProject_BE.Controllers.Authentication
                 var user = await _context.Users.SingleOrDefaultAsync(u => u.Email == email);
                 if (user != null)
                 {
-                    var token = GenerateRandomToken(64);
+                    var token = TokenHelper.GenerateRandomToken(64);
                     string url = Constant.ClientUrl+"/set-password?token=" + token;
                     string urlNotMe = Constant.ClientUrl + "/not-me?token=" + token;
                     MailMessage mm = new MailMessage("nguyendailam04@gmail.com", email);
@@ -205,7 +199,7 @@ namespace CapstoneProject_BE.Controllers.Authentication
                 var user = await _context.Users.SingleOrDefaultAsync(u => u.Email == model.Email);
                 if (user == null&& Constant.validateGuidRegex.IsMatch(model.Password))
                 {
-                    var token = GenerateRandomToken(64);
+                    var token = TokenHelper.GenerateRandomToken(64);
                     MailMessage mm = new MailMessage("nguyendailam04@gmail.com", model.Email);
                     string url = Constant.ClientUrl + "/verification-success?token=" + token;
                     string urlNotMe = Constant.ClientUrl + "/not-me?token=" + token;
@@ -259,19 +253,11 @@ namespace CapstoneProject_BE.Controllers.Authentication
 
 
 
-        private string GenerateRandomToken()
-        {
-            var random = new Byte[32];
-            using (var rng = RandomNumberGenerator.Create())
-            {
-                rng.GetBytes(random);
-                return Convert.ToBase64String(random);
-            }
-        }
+
         private TokenModel GenerateToken(User user)
         {
             var access = GenerateAccessToken(user);
-            var refresh = GenerateRandomToken();
+            var refresh = TokenHelper.GenerateRandomToken();
             var tokenhandler = new JwtSecurityTokenHandler();
             var refreshEntity = new RefreshToken
             {

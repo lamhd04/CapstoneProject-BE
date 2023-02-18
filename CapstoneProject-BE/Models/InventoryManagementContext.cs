@@ -16,6 +16,8 @@ namespace CapstoneProject_BE.Models
         public DbSet<Category> Categories { get; set; }
         public DbSet<Supplier> Suppliers { get; set; }
         public DbSet<MeasuredUnit> MeasuredUnits { get; set; }
+        public DbSet<ImportOrder> ImportOrders { get; set; }
+        public DbSet<ImportOrderDetail> ImportOrderDetails { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>(e =>
@@ -23,10 +25,10 @@ namespace CapstoneProject_BE.Models
                 e.ToTable("User");
                 e.HasKey(u => u.UserId);
                 e.HasOne(u => u.Role)
-                .WithMany(u=>u.Users)
-                .HasForeignKey(u=>u.RoleId);
+                .WithMany(u => u.Users)
+                .HasForeignKey(u => u.RoleId);
                 e.Property(u => u.Email).IsRequired();
-                e.Property(u=>u.Password).IsRequired();
+                e.Property(u => u.Password).IsRequired();
                 e.Property(u => u.RoleId).HasDefaultValue(0);
                 e.Property(u => u.UserId).UseIdentityColumn();
                 e.Property(u => u.Status).HasDefaultValue(false);
@@ -52,8 +54,8 @@ namespace CapstoneProject_BE.Models
             {
                 e.ToTable("EmailToken");
                 e.HasKey(r => r.TokenId);
-                e.HasOne(t=>t.User)
-                .WithMany(a=>a.EmailTokens)
+                e.HasOne(t => t.User)
+                .WithMany(a => a.EmailTokens)
                 .HasForeignKey(u => u.UserId);
                 e.Property(u => u.Token).IsRequired();
                 e.Property(u => u.TokenId).UseIdentityColumn();
@@ -72,6 +74,9 @@ namespace CapstoneProject_BE.Models
             {
                 e.ToTable("Supplier");
                 e.HasKey(r => r.SupplierId);
+                e.HasMany(r => r.ImportOrders)
+.WithOne(r => r.Supplier)
+.HasForeignKey(r => r.SupplierId).OnDelete(DeleteBehavior.NoAction);
                 e.Property(u => u.SupplierName).IsRequired();
                 e.Property(u => u.SupplierPhone).IsRequired();
                 e.Property(u => u.Ward).IsRequired();
@@ -98,7 +103,40 @@ namespace CapstoneProject_BE.Models
                 e.HasMany(t => t.MeasuredUnits)
                 .WithOne(t => t.Product)
                 .HasForeignKey(t => t.ProductId);
+                e.HasMany(r => r.ImportOrderDetails)
+.WithOne(r => r.Product)
+.HasForeignKey(r => r.ProductId).OnDelete(DeleteBehavior.NoAction);
                 e.Property(u => u.ProductId).UseIdentityColumn();
+            });
+
+            modelBuilder.Entity<ImportOrder>(e =>
+            {
+                e.ToTable("ImportOrder");
+                e.HasKey(r => r.ImportId);
+                e.HasMany(r => r.ImportOrderDetails)
+                .WithOne(r => r.ImportOrder)
+                .HasForeignKey(r => r.ImportId);
+
+                e.Property(u => u.Paid).IsRequired();
+                e.Property(u => u.TotalCost).IsRequired();
+                e.Property(u => u.TotalAmount).IsRequired();
+                e.Property(u => u.OtherExpense).HasDefaultValue(0);
+                e.Property(u => u.InDebted).HasDefaultValue(0);
+                e.Property(u => u.Discount).HasDefaultValue(0);
+                e.Property(u => u.ImportId).UseIdentityColumn();
+            });
+            modelBuilder.Entity<ImportOrderDetail>(e =>
+            {
+                e.ToTable("ImportOrderDetail");
+                e.HasKey(r => r.ImportId);
+                e.HasOne(r => r.MeasuredUnit)
+                .WithOne(r => r.ImportOrderDetail)
+                .HasForeignKey<ImportOrderDetail>(r => r.MeasuredUnitId);
+                e.Property(u => u.Amount).IsRequired();
+                e.Property(u => u.CostPrice).IsRequired();
+                e.Property(u => u.ProductId).IsRequired();
+                e.Property(u => u.Discount).HasDefaultValue(0);
+                e.Property(u => u.Price).IsRequired();
             });
         }
     }

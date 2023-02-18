@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace CapstoneProject_BE.Models
 {
@@ -19,7 +20,9 @@ namespace CapstoneProject_BE.Models
         public string? Image { get; set; }
         public DateTime Created { get; set; }
         public bool? Status { get; set; }
-        public ICollection<MeasuredUnit> MeasuredUnits { get; set; }
+        [JsonIgnore]
+        public virtual ICollection<ImportOrderDetail> ImportOrderDetails { get; set; }
+        public virtual ICollection<MeasuredUnit> MeasuredUnits { get; set; }
         public Category Category { get; set; }
         public Supplier Supplier { get; set; }
         public string? Barcode { get; set; }

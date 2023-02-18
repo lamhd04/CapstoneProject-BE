@@ -19,6 +19,8 @@ namespace CapstoneProject_BE.Models
         [DataType(DataType.EmailAddress)]
         public string SupplierEmail { get; set; }
         [JsonIgnore]
-        public ICollection<Product>? Products { get; set; }
+        public virtual ICollection<Product>? Products { get; set; }
+        [JsonIgnore]
+        public virtual ICollection<ImportOrder> ImportOrders { get; set; }
     }
 }

@@ -4,6 +4,7 @@ using CapstoneProject_BE.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CapstoneProject_BE.Migrations
 {
     [DbContext(typeof(InventoryManagementContext))]
-    partial class InventoryManagementContextModelSnapshot : ModelSnapshot
+    [Migration("20230218112444_a")]
+    partial class a
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -99,10 +101,6 @@ namespace CapstoneProject_BE.Migrations
                         .HasColumnType("real")
                         .HasDefaultValue(0f);
 
-                    b.Property<string>("ImportCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<float>("InDebted")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("real")
@@ -122,8 +120,7 @@ namespace CapstoneProject_BE.Migrations
                     b.Property<int>("State")
                         .HasColumnType("int");
 
-                    b.Property<int?>("SupplierId")
-                        .IsRequired()
+                    b.Property<int>("SupplierId")
                         .HasColumnType("int");
 
                     b.Property<float>("Total")
@@ -139,8 +136,6 @@ namespace CapstoneProject_BE.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("ImportId");
-
-                    b.HasIndex("SupplierId");
 
                     b.ToTable("ImportOrder", (string)null);
                 });
@@ -416,17 +411,6 @@ namespace CapstoneProject_BE.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("CapstoneProject_BE.Models.ImportOrder", b =>
-                {
-                    b.HasOne("CapstoneProject_BE.Models.Supplier", "Supplier")
-                        .WithMany("ImportOrders")
-                        .HasForeignKey("SupplierId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("Supplier");
-                });
-
             modelBuilder.Entity("CapstoneProject_BE.Models.ImportOrderDetail", b =>
                 {
                     b.HasOne("CapstoneProject_BE.Models.ImportOrder", "ImportOrder")
@@ -536,8 +520,6 @@ namespace CapstoneProject_BE.Migrations
 
             modelBuilder.Entity("CapstoneProject_BE.Models.Supplier", b =>
                 {
-                    b.Navigation("ImportOrders");
-
                     b.Navigation("Products");
                 });
 

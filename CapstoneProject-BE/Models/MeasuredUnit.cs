@@ -9,6 +9,8 @@ namespace CapstoneProject_BE.Models
         public string MeasuredUnitName { get; set; }
         public int MeasuredUnitValue { get; set; }
         [JsonIgnore]
-        public Product Product { get; set; }
+        public virtual Product Product { get; set; }
+        [JsonIgnore]
+        public virtual ImportOrderDetail ImportOrderDetail { get; set; }
     }
 }

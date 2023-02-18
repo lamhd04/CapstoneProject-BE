@@ -74,7 +74,7 @@ namespace CapstoneProject_BE.Controllers.Product
             {
                 var result = await _context.Products.Include(x => x.Supplier)
                     .Include(x => x.MeasuredUnits).Include(x => x.Category)
-                    .SingleOrDefaultAsync(x => x.ProductId == prodId&&(x.Barcode==barcode||x.Barcode==""));
+                    .SingleOrDefaultAsync(x => x.ProductId == prodId&&(x.Barcode==barcode||barcode==""));
                 if (result != null)
                 {
                     return Ok(result);

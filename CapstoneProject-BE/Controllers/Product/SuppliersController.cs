@@ -148,8 +148,11 @@ namespace CapstoneProject_BE.Controllers.Product
                 if (supplier != null)
                 {
                     var result = mapper.Map<SupplierDTO>(supplier);
-                    result.City = JsonSerializer.Deserialize<City>(supplier.City);
-                    result.District= JsonSerializer.Deserialize<District>(supplier.District);
+                    if (result.City != null & result.District != null)
+                    {
+                        result.City = JsonSerializer.Deserialize<City>(supplier.City);
+                        result.District = JsonSerializer.Deserialize<District>(supplier.District);
+                    }                   
                     return Ok(result);
                 }
                 else

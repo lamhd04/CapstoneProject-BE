@@ -13,6 +13,8 @@ namespace CapstoneProject_BE.AutoMapper
             CreateMap<MeasuredUnitDTO, MeasuredUnit>();
             CreateMap<SupplierDTO, Supplier>();
             CreateMap<Supplier, SupplierDTO>();
+            CreateMap<ImportOrderDTO, ImportOrder>();
+            CreateMap<ImportDetailDTO, ImportOrderDetail>();
         }
     }
         
