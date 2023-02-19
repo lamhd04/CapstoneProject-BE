@@ -116,7 +116,9 @@ namespace CapstoneProject_BE.Models
                 e.HasMany(r => r.ImportOrderDetails)
                 .WithOne(r => r.ImportOrder)
                 .HasForeignKey(r => r.ImportId);
-
+                e.HasOne(r => r.User)
+                .WithMany(r => r.ImportOrder)
+                .HasForeignKey(r => r.UserId);
                 e.Property(u => u.Paid).IsRequired();
                 e.Property(u => u.TotalCost).IsRequired();
                 e.Property(u => u.TotalAmount).IsRequired();

@@ -77,14 +77,14 @@ namespace CapstoneProject_BE.Controllers.Import
             }
         }
         [HttpPost("GetImportOrder")]
-        public async Task<IActionResult> GetImport(int offset, int limit, int? supId = 0, int? state = 0, DateTime? date = null, string? code = "")
+        public async Task<IActionResult> GetImport(int offset, int limit, int? supId = 0, int? state = 0, string? code = "")
         {
             try
             {
                 var result = await _context.ImportOrders.Include(a=>a.Supplier)
                     .Where(x => (x.Supplier.SupplierName.Contains(code)||code=="")
                 && (x.SupplierId == supId || supId == 0) && (x.State == state || state == 0)
-                && (x.Completed == date.Value.Date || date == null) && (x.ImportCode.Contains(code) || code == "")).ToListAsync();
+                 && (x.ImportCode.Contains(code) || code == "")).ToListAsync();
                 if (limit > result.Count() && offset >= 0)
                 {
                     return Ok(new ResponseData<ImportOrder>
@@ -108,6 +108,28 @@ namespace CapstoneProject_BE.Controllers.Import
                 else
                 {
                     return NotFound("Không kết quả");
+                }
+            }
+            catch
+            {
+                return StatusCode(500);
+            }
+        }
+        [HttpPost("GetImportDetail")]
+        public async Task<IActionResult> GetImportDetail(int importid)
+        {
+            try
+            {
+                var result = await _context.ImportOrders
+                    .Include(x=>x.ImportOrderDetails).ThenInclude(x=>x.Product).Include(x=>x.Supplier).Include(x=>x.User)
+                    .SingleOrDefaultAsync(x => x.ImportId == importid);
+                if (result != null)
+                {
+                    return Ok(result);
+                }
+                else
+                {
+                    return BadRequest("Không có dữ liệu");
                 }
             }
             catch

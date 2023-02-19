@@ -221,8 +221,9 @@ namespace CapstoneProject_BE.Controllers.Authentication
                     var newuser = new User
                     {
                         Email = model.Email,
-                        Password = HashHelper.Encrypt(model.Password,_configuration),
-                        RoleId = 1
+                        Password = HashHelper.Encrypt(model.Password, _configuration),
+                        RoleId = 1,
+                        UserName = TokenHelper.GenerateRandomToken(8)
                     };
                     _context.Users.Add(newuser);
                     await _context.SaveChangesAsync();
