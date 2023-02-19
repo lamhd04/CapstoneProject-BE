@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
 using CapstoneProject_BE.AutoMapper;
 using CapstoneProject_BE.DTO;
+using CapstoneProject_BE.Helper;
 using CapstoneProject_BE.Models;
 using DocumentFormat.OpenXml.Drawing;
 using DocumentFormat.OpenXml.Math;
+using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -36,6 +38,7 @@ namespace CapstoneProject_BE.Controllers.Import
                     result.Created = DateTime.UtcNow;
                     result.ImportOrderDetails = mapper.Map<List<ImportOrderDetail>>(p.ImportDetailDTOs);
                     result.State = 0;
+                    result.ImportCode = TokenHelper.GenerateRandomToken(16);
                     _context.Add(result);
                     await _context.SaveChangesAsync();
                     return Ok("Thành công");
@@ -145,17 +148,26 @@ namespace CapstoneProject_BE.Controllers.Import
                 {
                     result.State = 2;
                     result.Completed = DateTime.UtcNow;
-                    foreach (var a in result.ImportOrderDetails)
+                    foreach (var detail in result.ImportOrderDetails)
                     {
-                        var product = await _context.Products.SingleOrDefaultAsync(x => x.ProductId == a.ProductId);
-                        if (a.MeasuredUnit != null)
+                        var product = await _context.Products.SingleOrDefaultAsync(x => x.ProductId == detail.ProductId);
+                        var history = new ProductHistory
                         {
-                            product.InStock += a.Amount * a.MeasuredUnit.MeasuredUnitValue;
+                            ProductId = product.ProductId,
+                            Amount = product.InStock,
+                            ActionType = 1
+                        };
+                        if (detail.MeasuredUnit != null)
+                        {
+                            history.AmountDifferential = $"+{detail.Amount * detail.MeasuredUnit.MeasuredUnitValue}";
+                            product.InStock += detail.Amount * detail.MeasuredUnit.MeasuredUnitValue;
                         }
                         else
                         {
-                            product.InStock += a.Amount;
+                            history.AmountDifferential = $"+{detail.Amount}";
+                            product.InStock += detail.Amount;
                         }
+                        _context.Add(history);
                     }
                     await _context.SaveChangesAsync();
                     return Ok("Thành công");

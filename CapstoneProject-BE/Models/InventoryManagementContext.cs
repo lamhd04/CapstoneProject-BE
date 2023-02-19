@@ -138,6 +138,16 @@ namespace CapstoneProject_BE.Models
                 e.Property(u => u.Discount).HasDefaultValue(0);
                 e.Property(u => u.Price).IsRequired();
             });
+            modelBuilder.Entity<ProductHistory>(e =>
+            {
+                e.ToTable("ProductHistory");
+                e.HasKey(r => r.HistoryId);
+                e.HasOne(r => r.Product)
+                .WithMany(r => r.ProductHistories)
+                .HasForeignKey(r => r.ProductId);
+                e.Property(u => u.ProductId).IsRequired();
+                e.Property(u => u.Price).IsRequired();
+            });
         }
     }
 }

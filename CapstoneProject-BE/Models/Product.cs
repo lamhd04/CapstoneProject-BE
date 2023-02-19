@@ -23,6 +23,7 @@ namespace CapstoneProject_BE.Models
         [JsonIgnore]
         public virtual ICollection<ImportOrderDetail> ImportOrderDetails { get; set; }
         public virtual ICollection<MeasuredUnit> MeasuredUnits { get; set; }
+        public virtual ICollection<ProductHistory> ProductHistories { get; set; }
         public Category Category { get; set; }
         public Supplier Supplier { get; set; }
         public string? Barcode { get; set; }

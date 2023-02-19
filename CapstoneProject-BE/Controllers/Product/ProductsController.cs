@@ -33,7 +33,7 @@ namespace CapstoneProject_BE.Controllers.Product
         {
             try
             {
-                var result = await _context.Products.Include(x => x.Supplier).Include(x => x.Category)
+                var result = await _context.Products.Include(x => x.Supplier).Include(x => x.Category).Include(x=>x.MeasuredUnits)
                     .Where(x => (x.ProductCode.Contains(search) || x.ProductName.Contains(search) || x.Barcode.Contains(search))
                 && (x.CategoryId == catId || catId == 0) && (x.SupplierId == supId || supId == 0)).ToListAsync();
                 if (limit > result.Count() && offset >= 0)
@@ -101,6 +101,10 @@ namespace CapstoneProject_BE.Controllers.Product
                     var c = mapper.Map<Models.Product>(p);
                     c.Created = DateTime.UtcNow;
                     c.ProductCode = GenerateProductCode(_context.Products.Count()+1);
+                    if (c.Barcode == "")
+                    {
+                        c.Barcode = c.ProductCode;
+                    }
                     _context.Add(c);
                     await _context.SaveChangesAsync();
                     return Ok("Thành công");
@@ -131,6 +135,22 @@ namespace CapstoneProject_BE.Controllers.Product
                     {
                         result.ProductCode = GenerateProductCode(productDTO.ProductId);
                     }
+                    if (result.Barcode == "")
+                    {
+                        result.Barcode = result.ProductCode;
+                    }
+                    var costdifferential = editProduct.CostPrice - result.CostPrice;
+                    var pricedifferential = editProduct.SellingPrice - result.SellingPrice;
+                    var history = new ProductHistory
+                    {
+                        ActionType = 0,
+                        ProductId = result.ProductId,
+                        CostPrice = editProduct.CostPrice,
+                        CostPriceDifferential = costdifferential > 0 ? $"+{costdifferential}" : costdifferential + "",
+                        Price=result.SellingPrice,
+                        PriceDifferential= pricedifferential > 0?$"+{pricedifferential}": pricedifferential + ""
+                    };
+                    _context.Add(history);
                     _context.Update(result);
                     await _context.SaveChangesAsync();
                     return Ok("Thành công");
