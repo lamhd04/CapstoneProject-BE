@@ -14,7 +14,11 @@ namespace CapstoneProject_BE.AutoMapper
             CreateMap<SupplierDTO, Supplier>();
             CreateMap<Supplier, SupplierDTO>();
             CreateMap<ImportOrderDTO, ImportOrder>();
-            CreateMap<ImportDetailDTO, ImportOrderDetail>();
+            CreateMap<ImportDetailDTO, ImportOrderDetail>()
+                                .ForMember(cdto => cdto.MeasuredUnitId,
+                map => map.MapFrom(
+                    c => c.MeasuredUnitId==0? null:c.MeasuredUnitId
+                    ));
         }
     }
         
