@@ -132,8 +132,8 @@ namespace CapstoneProject_BE.Models
                 e.ToTable("ImportOrderDetail");
                 e.HasKey(r => r.ImportId);
                 e.HasOne(r => r.MeasuredUnit)
-                .WithOne(r => r.ImportOrderDetail)
-                .HasForeignKey<ImportOrderDetail>(r => r.MeasuredUnitId);
+                .WithMany(r => r.ImportOrderDetail)
+                .HasForeignKey(r => r.MeasuredUnitId);
                 e.Property(u => u.Amount).IsRequired();
                 e.Property(u => u.CostPrice).IsRequired();
                 e.Property(u => u.ProductId).IsRequired();

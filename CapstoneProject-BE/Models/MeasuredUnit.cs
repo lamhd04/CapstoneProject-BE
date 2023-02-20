@@ -11,6 +11,6 @@ namespace CapstoneProject_BE.Models
         [JsonIgnore]
         public virtual Product Product { get; set; }
         [JsonIgnore]
-        public virtual ImportOrderDetail ImportOrderDetail { get; set; }
+        public virtual ICollection<ImportOrderDetail> ImportOrderDetail { get; set; }
     }
 }
