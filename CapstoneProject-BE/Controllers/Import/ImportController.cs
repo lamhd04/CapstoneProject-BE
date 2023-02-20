@@ -82,7 +82,7 @@ namespace CapstoneProject_BE.Controllers.Import
             try
             {
                 var result = await _context.ImportOrders.Include(a=>a.Supplier)
-                    .Where(x => (x.Supplier.SupplierName.Contains(code)||code=="")
+                    .Where(x => (x.Supplier.SupplierName.Contains(code)||x.ImportCode.Contains(code)||code=="")
                 && (x.SupplierId == supId || supId == 0) && (x.State == state || state == 0)
                  ).ToListAsync();
                 if (limit > result.Count() && offset >= 0)
