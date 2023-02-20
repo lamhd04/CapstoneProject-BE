@@ -26,6 +26,33 @@ namespace CapstoneProject_BE.Controllers.Import
             var config = new MapperConfiguration(cfg => cfg.AddProfile(new MappingProfile()));
             mapper = config.CreateMapper();
         }
+        [HttpPost("UpdateImportOrder")]
+        public async Task<IActionResult> UpdateImportOrder(ImportOrderDTO p)
+        {
+            try
+            {
+
+                if (p != null)
+                {
+                    var result = mapper.Map<ImportOrder>(p);
+                    result.Created = DateTime.UtcNow;
+                    result.ImportOrderDetails = mapper.Map<List<ImportOrderDetail>>(p.ImportDetailDTOs);
+                    result.State = 0;
+                    result.ImportCode = TokenHelper.GenerateRandomToken(16);
+                    _context.Update(result);
+                    await _context.SaveChangesAsync();
+                    return Ok("Thành công");
+                }
+                else
+                {
+                    return BadRequest("Không có dữ liệu");
+                }
+            }
+            catch
+            {
+                return StatusCode(500);
+            }
+        }
         [HttpPost("CreateImportOrder")]
         public async Task<IActionResult> CreateImportOrder(ImportOrderDTO p)
         {
