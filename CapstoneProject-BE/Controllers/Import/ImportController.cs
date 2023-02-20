@@ -35,11 +35,13 @@ namespace CapstoneProject_BE.Controllers.Import
                 if (p != null)
                 {
                     var result = mapper.Map<ImportOrder>(p);
-                    result.Created = DateTime.UtcNow;
-                    result.ImportOrderDetails = mapper.Map<List<ImportOrderDetail>>(p.ImportDetailDTOs);
+                    result.Created = DateTime.Now;
                     result.State = 0;
                     result.ImportCode = TokenHelper.GenerateRandomToken(16);
                     _context.Update(result);
+                    await _context.SaveChangesAsync();
+                    _context.ChangeTracker.Clear();
+                    result.ImportOrderDetails = mapper.Map<List<ImportOrderDetail>>(p.ImportDetailDTOs);
                     await _context.SaveChangesAsync();
                     return Ok("Thành công");
                 }
@@ -62,11 +64,13 @@ namespace CapstoneProject_BE.Controllers.Import
                 if (p != null)
                 {
                     var result = mapper.Map<ImportOrder>(p);
-                    result.Created = DateTime.UtcNow;
-                    result.ImportOrderDetails = mapper.Map<List<ImportOrderDetail>>(p.ImportDetailDTOs);
+                    result.Created = DateTime.Now;
                     result.State = 0;
                     result.ImportCode = TokenHelper.GenerateRandomToken(16);
                     _context.Add(result);
+                    await _context.SaveChangesAsync();
+                    _context.ChangeTracker.Clear();
+                    result.ImportOrderDetails = mapper.Map<List<ImportOrderDetail>>(p.ImportDetailDTOs);
                     await _context.SaveChangesAsync();
                     return Ok("Thành công");
                 }
@@ -89,7 +93,7 @@ namespace CapstoneProject_BE.Controllers.Import
                 if (result != null)
                 {
                     result.State = 1;
-                    result.Approved = DateTime.UtcNow;
+                    result.Approved = DateTime.Now;
                     await _context.SaveChangesAsync();
                     return Ok("Thành công");
                 }
@@ -103,7 +107,7 @@ namespace CapstoneProject_BE.Controllers.Import
                 return StatusCode(500);
             }
         }
-        [HttpPost("GetImportOrder")]
+        [HttpGet("GetImportOrder")]
         public async Task<IActionResult> GetImport(int offset, int limit, int? supId = 0, int? state = 0, string? code = "")
         {
             try
@@ -142,7 +146,7 @@ namespace CapstoneProject_BE.Controllers.Import
                 return StatusCode(500);
             }
         }
-        [HttpPost("GetImportDetail")]
+        [HttpGet("GetImportDetail")]
         public async Task<IActionResult> GetImportDetail(int importid)
         {
             try
@@ -173,7 +177,7 @@ namespace CapstoneProject_BE.Controllers.Import
                 if (result != null)
                 {
                     result.State = 3;
-                    result.Approved = DateTime.UtcNow;
+                    result.Approved = DateTime.Now;
                     await _context.SaveChangesAsync();
                     return Ok("Thành công");
                 }
@@ -196,7 +200,7 @@ namespace CapstoneProject_BE.Controllers.Import
                 if (result != null)
                 {
                     result.State = 2;
-                    result.Completed = DateTime.UtcNow;
+                    result.Completed = DateTime.Now;
                     foreach (var detail in result.ImportOrderDetails)
                     {
                         var product = await _context.Products.SingleOrDefaultAsync(x => x.ProductId == detail.ProductId);
