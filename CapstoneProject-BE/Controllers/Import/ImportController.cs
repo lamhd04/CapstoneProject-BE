@@ -90,7 +90,7 @@ namespace CapstoneProject_BE.Controllers.Import
             try
             {
                 var result = await _context.ImportOrders.SingleOrDefaultAsync(x => x.ImportId == importid);
-                if (result != null)
+                if (result != null&&result.State==0)
                 {
                     result.State = 1;
                     result.Approved = DateTime.Now;
@@ -174,7 +174,7 @@ namespace CapstoneProject_BE.Controllers.Import
             try
             {
                 var result = await _context.ImportOrders.SingleOrDefaultAsync(x => x.ImportId == importid);
-                if (result != null)
+                if (result != null&&result.State==0)
                 {
                     result.State = 3;
                     result.Approved = DateTime.Now;
@@ -197,7 +197,7 @@ namespace CapstoneProject_BE.Controllers.Import
             try
             {
                 var result = await _context.ImportOrders.Include(a => a.ImportOrderDetails).ThenInclude(a => a.MeasuredUnit).SingleOrDefaultAsync(x => x.ImportId == importid);
-                if (result != null)
+                if (result != null && result.State == 1)
                 {
                     result.State = 2;
                     result.Completed = DateTime.Now;
