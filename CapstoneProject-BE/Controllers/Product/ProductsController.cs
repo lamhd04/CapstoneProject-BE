@@ -144,11 +144,11 @@ namespace CapstoneProject_BE.Controllers.Product
                     var history = new ProductHistory
                     {
                         ActionType = 0,
-                        ProductId = result.ProductId,
-                        CostPrice = result.CostPrice,
-                        CostPriceDifferential = costdifferential > 0 ? $"+{costdifferential}" : costdifferential + "",
+                        ProductId = editProduct.ProductId,
+                        CostPrice = editProduct.CostPrice,
+                        CostPriceDifferential = costdifferential > 0 ? $"-{costdifferential}" : $"+{costdifferential}",
                         Price=result.SellingPrice,
-                        PriceDifferential= pricedifferential > 0?$"+{pricedifferential}": pricedifferential + ""
+                        PriceDifferential= pricedifferential > 0?$"-{pricedifferential}": $"+{pricedifferential}" 
                     };
                     _context.Add(history);
                     _context.Update(result);

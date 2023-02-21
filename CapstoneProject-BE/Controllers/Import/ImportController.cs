@@ -5,6 +5,7 @@ using CapstoneProject_BE.Helper;
 using CapstoneProject_BE.Models;
 using DocumentFormat.OpenXml.Drawing;
 using DocumentFormat.OpenXml.Math;
+using DocumentFormat.OpenXml.Vml;
 using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -188,7 +189,7 @@ namespace CapstoneProject_BE.Controllers.Import
         {
             try
             {
-                var result = await _context.ImportOrders.Include(a => a.ImportOrderDetails).ThenInclude(a => a.MeasuredUnit).SingleOrDefaultAsync(x => x.ImportId == importid);
+                var result = await _context.ImportOrders.Include(a => a.ImportOrderDetails).SingleOrDefaultAsync(x => x.ImportId == importid);
                 if (result != null && result.State == 1)
                 {
                     result.State = 2;
@@ -201,16 +202,28 @@ namespace CapstoneProject_BE.Controllers.Import
                             ProductId = product.ProductId,
                             ActionType = 1
                         };
-                        if (detail.MeasuredUnit != null)
+                        int total = 0;
+                        if (detail.MeasuredUnitId != null)
                         {
-                            history.AmountDifferential = $"+{detail.Amount * detail.MeasuredUnit.MeasuredUnitValue}";
-                            product.InStock += detail.Amount * detail.MeasuredUnit.MeasuredUnitValue;
+                            detail.MeasuredUnit = await _context.MeasuredUnits.SingleOrDefaultAsync(x => x.MeasuredUnitId == detail.MeasuredUnitId);
+                            total = detail.Amount * detail.MeasuredUnit.MeasuredUnitValue;
+                            product.InStock += total;
                         }
                         else
                         {
+                            total = detail.Amount;
                             history.AmountDifferential = $"+{detail.Amount}";
-                            product.InStock += detail.Amount;
+                            product.InStock += total;
                         }
+                        history.AmountDifferential = $"+{total}";
+                        history.CostPrice = product.CostPrice;
+                        history.Price = product.SellingPrice;
+                        product.CostPrice = (total * detail.CostPrice + product.InStock * product.CostPrice) / (total + product.InStock);
+                        product.SellingPrice = (total * detail.Price + product.InStock * product.SellingPrice) / (total + product.InStock);
+                        var costdifferential = product.CostPrice - history.CostPrice;
+                        var pricedifferential = product.SellingPrice - history.Price;
+                        history.CostPriceDifferential = costdifferential > 0 ? $"+{costdifferential}" : $"-{costdifferential}";
+                        history.PriceDifferential = pricedifferential > 0 ? $"+{pricedifferential}" : $"-{pricedifferential}";
                         history.Amount = product.InStock;
                         _context.Add(history);
                     }
