@@ -130,7 +130,7 @@ namespace CapstoneProject_BE.Models
             modelBuilder.Entity<ImportOrderDetail>(e =>
             {
                 e.ToTable("ImportOrderDetail");
-                e.HasKey(r => r.ImportId);
+                e.HasKey(r => r.DetailId);
                 e.HasOne(r => r.MeasuredUnit)
                 .WithMany(r => r.ImportOrderDetail)
                 .HasForeignKey(r => r.MeasuredUnitId);
@@ -139,6 +139,7 @@ namespace CapstoneProject_BE.Models
                 e.Property(u => u.ProductId).IsRequired();
                 e.Property(u => u.Discount).HasDefaultValue(0);
                 e.Property(u => u.Price).IsRequired();
+                e.Property(u => u.DetailId).UseIdentityColumn();
             });
             modelBuilder.Entity<ProductHistory>(e =>
             {

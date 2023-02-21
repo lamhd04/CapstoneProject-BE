@@ -73,7 +73,7 @@ namespace CapstoneProject_BE.Controllers.Product
             try
             {
                 var result = await _context.Products.Include(x => x.Supplier)
-                    .Include(x => x.MeasuredUnits).Include(x => x.Category)
+                    .Include(x => x.MeasuredUnits).Include(x => x.Category).Include(x=>x.ProductHistories)
                     .SingleOrDefaultAsync(x => x.ProductId == prodId&&(x.Barcode==barcode||barcode==""));
                 if (result != null)
                 {
@@ -145,7 +145,7 @@ namespace CapstoneProject_BE.Controllers.Product
                     {
                         ActionType = 0,
                         ProductId = result.ProductId,
-                        CostPrice = editProduct.CostPrice,
+                        CostPrice = result.CostPrice,
                         CostPriceDifferential = costdifferential > 0 ? $"+{costdifferential}" : costdifferential + "",
                         Price=result.SellingPrice,
                         PriceDifferential= pricedifferential > 0?$"+{pricedifferential}": pricedifferential + ""

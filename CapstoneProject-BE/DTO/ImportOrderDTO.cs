@@ -5,6 +5,7 @@ namespace CapstoneProject_BE.DTO
     public class ImportOrderDTO
     {
         public int ImportId { get; set; }
+        public string? ImportCode { get; set; }
         public int UserId { get; set; }
         public int SupplierId { get; set; }
         public int TotalAmount { get; set; }
@@ -16,7 +17,7 @@ namespace CapstoneProject_BE.DTO
         public float InDebted { get; set; }
         public string? Note { get; set; }
         public int State { get; set; }
-        public List<ImportDetailDTO> ImportDetailDTOs { get; set; } 
+        public List<ImportDetailDTO> ImportOrderDetails { get; set; } 
         
     }
 }

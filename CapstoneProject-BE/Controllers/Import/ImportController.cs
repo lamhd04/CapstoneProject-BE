@@ -26,7 +26,7 @@ namespace CapstoneProject_BE.Controllers.Import
             var config = new MapperConfiguration(cfg => cfg.AddProfile(new MappingProfile()));
             mapper = config.CreateMapper();
         }
-        [HttpPost("UpdateImportOrder")]
+        [HttpPut("UpdateImportOrder")]
         public async Task<IActionResult> UpdateImportOrder(ImportOrderDTO p)
         {
             try
@@ -37,11 +37,7 @@ namespace CapstoneProject_BE.Controllers.Import
                     var result = mapper.Map<ImportOrder>(p);
                     result.Created = DateTime.Now;
                     result.State = 0;
-                    result.ImportCode = TokenHelper.GenerateRandomToken(16);
                     _context.Update(result);
-                    await _context.SaveChangesAsync();
-                    _context.ChangeTracker.Clear();
-                    result.ImportOrderDetails = mapper.Map<List<ImportOrderDetail>>(p.ImportDetailDTOs);
                     await _context.SaveChangesAsync();
                     return Ok("Thành công");
                 }
@@ -60,17 +56,13 @@ namespace CapstoneProject_BE.Controllers.Import
         {
             try
             {
-
                 if (p != null)
                 {
-                    var result = mapper.Map<ImportOrder>(p);
+                    var result = mapper.Map<Models.ImportOrder>(p);
                     result.Created = DateTime.Now;
                     result.State = 0;
                     result.ImportCode = TokenHelper.GenerateRandomToken(16);
                     _context.Add(result);
-                    await _context.SaveChangesAsync();
-                    _context.ChangeTracker.Clear();
-                    result.ImportOrderDetails = mapper.Map<List<ImportOrderDetail>>(p.ImportDetailDTOs);
                     await _context.SaveChangesAsync();
                     return Ok("Thành công");
                 }
@@ -207,7 +199,6 @@ namespace CapstoneProject_BE.Controllers.Import
                         var history = new ProductHistory
                         {
                             ProductId = product.ProductId,
-                            Amount = product.InStock,
                             ActionType = 1
                         };
                         if (detail.MeasuredUnit != null)
@@ -220,6 +211,7 @@ namespace CapstoneProject_BE.Controllers.Import
                             history.AmountDifferential = $"+{detail.Amount}";
                             product.InStock += detail.Amount;
                         }
+                        history.Amount = product.InStock;
                         _context.Add(history);
                     }
                     await _context.SaveChangesAsync();

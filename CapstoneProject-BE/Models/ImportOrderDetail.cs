@@ -4,6 +4,7 @@ namespace CapstoneProject_BE.Models
 {
     public class ImportOrderDetail
     {
+        public int DetailId { get; set; }
         public int ImportId { get; set; }
         public int ProductId { get; set; }
         public int? MeasuredUnitId { get; set; }
