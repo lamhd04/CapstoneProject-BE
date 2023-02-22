@@ -12,7 +12,15 @@ namespace CapstoneProject_BE.AutoMapper
             CreateMap<ProductDTO, Product>();
             CreateMap<MeasuredUnitDTO, MeasuredUnit>();
             CreateMap<SupplierDTO, Supplier>();
-            CreateMap<Supplier, SupplierDTO>();
+            CreateMap<Supplier, SupplierDTO>()
+                .ForMember(cdto => cdto.City,
+                map => map.MapFrom(
+                    c => c.City == "" ? null : JsonSerializer.Deserialize<City>(c.City,new JsonSerializerOptions())
+                    ))
+                .ForMember(cdto => cdto.District,
+                map => map.MapFrom(
+                    c => c.District == "" ? null : JsonSerializer.Deserialize<District>(c.District, new JsonSerializerOptions())
+                    ));
             CreateMap<ImportOrderDTO, ImportOrder>();
             CreateMap<ImportDetailDTO, ImportOrderDetail>()
                                 .ForMember(cdto => cdto.MeasuredUnitId,
