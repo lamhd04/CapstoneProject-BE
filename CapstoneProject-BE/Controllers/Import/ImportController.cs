@@ -101,13 +101,13 @@ namespace CapstoneProject_BE.Controllers.Import
             }
         }
         [HttpGet("GetImportOrder")]
-        public async Task<IActionResult> GetImport(int offset, int limit, int? supId = 0, int? state = 0, string? code = "")
+        public async Task<IActionResult> GetImport(int offset, int limit, int? supId = 0, int? state = -1, string? code = "")
         {
             try
             {
                 var result = await _context.ImportOrders.Include(a=>a.Supplier)
                     .Where(x => (x.Supplier.SupplierName.Contains(code)||x.ImportCode.Contains(code)||code=="")
-                && (x.SupplierId == supId || supId == 0) && (x.State == state || state == 0)
+                && (x.SupplierId == supId || supId == 0) && (x.State == state || state == -1)
                  ).ToListAsync();
                 if (limit > result.Count() && offset >= 0)
                 {
@@ -225,6 +225,7 @@ namespace CapstoneProject_BE.Controllers.Import
                         history.CostPriceDifferential = costdifferential > 0 ? $"+{costdifferential}" : $"-{costdifferential}";
                         history.PriceDifferential = pricedifferential > 0 ? $"+{pricedifferential}" : $"-{pricedifferential}";
                         history.Amount = product.InStock;
+                        history.Date = DateTime.Now;
                         _context.Add(history);
                     }
                     await _context.SaveChangesAsync();
