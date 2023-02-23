@@ -55,8 +55,6 @@ namespace CapstoneProject_BE.Controllers.Product
                 if (s != null)
                 {
                     var result=mapper.Map<Supplier>(s);
-                    result.City = JsonSerializer.Serialize(s.City);
-                    result.District = JsonSerializer.Serialize(s.District);
                     _context.Add(result);
                     await _context.SaveChangesAsync();
                     return Ok("Thành công");
@@ -82,8 +80,6 @@ namespace CapstoneProject_BE.Controllers.Product
                 {
                     _context.Entry(editSupplier).State = EntityState.Detached;
                     editSupplier=mapper.Map<Supplier>(s);
-                    editSupplier.City = JsonSerializer.Serialize(s.City);
-                    editSupplier.District = JsonSerializer.Serialize(s.District);
                     _context.Update(s);
                     await _context.SaveChangesAsync();
                     return Ok("Thành công");
