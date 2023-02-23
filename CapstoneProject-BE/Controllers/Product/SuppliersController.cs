@@ -140,11 +140,10 @@ namespace CapstoneProject_BE.Controllers.Product
         {
             try
             {
-                var supplier = await _context.Suppliers.SingleOrDefaultAsync(x => x.SupplierId == supId);
+                var supplier = await _context.Suppliers.SingleOrDefaultAsync(x=>x.SupplierId==supId);
                 if (supplier != null)
                 {
-                    var result = mapper.Map<SupplierDTO>(supplier);
-                 
+                    var result = mapper.Map<SupplierDTO>(supplier);                
                     return Ok(result);
                 }
                 else
