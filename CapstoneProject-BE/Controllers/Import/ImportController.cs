@@ -218,8 +218,8 @@ namespace CapstoneProject_BE.Controllers.Import
                         history.AmountDifferential = $"+{total}";
                         history.CostPrice = product.CostPrice;
                         history.Price = product.SellingPrice;
-                        product.CostPrice = (total * detail.CostPrice + product.InStock * product.CostPrice) / (total + product.InStock);
-                        product.SellingPrice = (total * detail.Price + product.InStock * product.SellingPrice) / (total + product.InStock);
+                        product.CostPrice = (detail.Amount*detail.CostPrice + product.InStock * product.CostPrice) / (total + product.InStock);
+                        product.SellingPrice = (detail.Amount *detail.Price + product.InStock * product.SellingPrice) / (total + product.InStock);
                         var costdifferential = product.CostPrice - history.CostPrice;
                         var pricedifferential = product.SellingPrice - history.Price;
                         history.CostPriceDifferential = costdifferential > 0 ? $"+{costdifferential}" : $"-{costdifferential}";

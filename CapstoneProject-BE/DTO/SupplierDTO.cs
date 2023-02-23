@@ -11,7 +11,7 @@ namespace CapstoneProject_BE.DTO
         public bool Status { get; set; }
         public City City { get; set; }
         public District District { get; set; }
-        public string Ward { get; set; }
+        public Ward Ward { get; set; }
         public string Address { get; set; }
         public string? Note { get; set; }
         [DataType(DataType.EmailAddress)]

@@ -20,6 +20,10 @@ namespace CapstoneProject_BE.AutoMapper
                 .ForMember(cdto => cdto.District,
                 map => map.MapFrom(
                     c => c.District == "" ? null : JsonSerializer.Deserialize<District>(c.District, new JsonSerializerOptions())
+                    ))
+                .ForMember(cdto => cdto.Ward,
+                map => map.MapFrom(
+                    c => c.Ward == "" ? null : JsonSerializer.Deserialize<District>(c.Ward, new JsonSerializerOptions())
                     ));
             CreateMap<ImportOrderDTO, ImportOrder>();
             CreateMap<ImportDetailDTO, ImportOrderDetail>()

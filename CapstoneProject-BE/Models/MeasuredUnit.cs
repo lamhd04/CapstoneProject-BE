@@ -8,6 +8,7 @@ namespace CapstoneProject_BE.Models
         public int ProductId { get; set; }
         public string MeasuredUnitName { get; set; }
         public int MeasuredUnitValue { get; set; }
+        public float? SuggestedPrice { get; set; }
         [JsonIgnore]
         public virtual Product Product { get; set; }
         [JsonIgnore]

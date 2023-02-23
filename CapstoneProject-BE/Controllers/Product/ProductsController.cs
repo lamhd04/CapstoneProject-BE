@@ -105,6 +105,10 @@ namespace CapstoneProject_BE.Controllers.Product
                     {
                         c.Barcode = c.ProductCode;
                     }
+                    foreach(var a in c.MeasuredUnits)
+                    {
+                        a.SuggestedPrice = (a.MeasuredUnitValue * c.SellingPrice);
+                    }
                     _context.Add(c);
                     await _context.SaveChangesAsync();
                     return Ok("Thành công");
@@ -150,6 +154,10 @@ namespace CapstoneProject_BE.Controllers.Product
                         Price=result.SellingPrice,
                         PriceDifferential= pricedifferential > 0?$"-{pricedifferential}": $"+{pricedifferential}" 
                     };
+                    foreach (var a in result.MeasuredUnits)
+                    {
+                        a.SuggestedPrice = (a.MeasuredUnitValue * result.SellingPrice);
+                    }
                     _context.Add(history);
                     _context.Update(result);
                     await _context.SaveChangesAsync();
