@@ -11,6 +11,9 @@ using Microsoft.Extensions.Configuration;
 using System.Drawing;
 using System.Text.Json;
 using IronXL;
+using BitMiracle.LibTiff.Classic;
+using System.IdentityModel.Tokens.Jwt;
+using DocumentFormat.OpenXml.Spreadsheet;
 
 namespace CapstoneProject_BE.Controllers.Product
 {
@@ -95,7 +98,7 @@ namespace CapstoneProject_BE.Controllers.Product
         {
             try
             {
-
+                //var uid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type.Equals("UserId")).Value);
                 if (p != null)
                 {
                     var c = mapper.Map<Models.Product>(p);
@@ -108,6 +111,19 @@ namespace CapstoneProject_BE.Controllers.Product
                     foreach(var a in c.MeasuredUnits)
                     {
                         a.SuggestedPrice = (a.MeasuredUnitValue * c.SellingPrice);
+                    }
+                    if (c.InStock != 0)
+                    {
+                        var history = new ProductHistory
+                        {
+                            //UserId=uid,
+                            ActionId = 4,
+                            ProductId = c.ProductId,
+                            CostPrice = c.CostPrice,
+                            Price = c.SellingPrice,
+                            Amount = c.InStock,
+                            AmountDifferential = $"+{c.InStock}"
+                        };
                     }
                     _context.Add(c);
                     await _context.SaveChangesAsync();
@@ -129,6 +145,7 @@ namespace CapstoneProject_BE.Controllers.Product
         {
             try
             {
+                //var uid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type.Equals("UserId")).Value);
                 var editProduct = await _context.Products.SingleOrDefaultAsync(x => x.ProductId == productDTO.ProductId);
                 if (editProduct != null)
                 {
@@ -147,7 +164,8 @@ namespace CapstoneProject_BE.Controllers.Product
                     var pricedifferential = editProduct.SellingPrice - result.SellingPrice;
                     var history = new ProductHistory
                     {
-                        ActionType = 0,
+                        //UserId=uid,
+                        ActionId = 3,
                         ProductId = editProduct.ProductId,
                         CostPrice = editProduct.CostPrice,
                         CostPriceDifferential = costdifferential > 0 ? $"-{costdifferential}" : $"+{costdifferential}",

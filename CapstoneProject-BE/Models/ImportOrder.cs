@@ -9,7 +9,6 @@
         public int TotalAmount { get; set; }
         public float Total { get; set; }
         public float TotalCost { get; set; }
-        public float Discount { get; set; }
         public float OtherExpense { get; set; }
         public float Paid { get; set; }
         public float InDebted { get; set; }

@@ -4,6 +4,7 @@ using CapstoneProject_BE.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CapstoneProject_BE.Migrations
 {
     [DbContext(typeof(InventoryManagementContext))]
-    partial class InventoryManagementContextModelSnapshot : ModelSnapshot
+    [Migration("20230226082225_addExport")]
+    partial class addExport
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -149,7 +151,7 @@ namespace CapstoneProject_BE.Migrations
                     b.Property<int>("TotalAmount")
                         .HasColumnType("int");
 
-                    b.Property<float>("TotalPrice")
+                    b.Property<float>("TotalCost")
                         .HasColumnType("real");
 
                     b.Property<int>("UserId")

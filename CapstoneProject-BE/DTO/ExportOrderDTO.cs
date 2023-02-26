@@ -1,6 +1,8 @@
-﻿namespace CapstoneProject_BE.Models
+﻿using CapstoneProject_BE.Models;
+
+namespace CapstoneProject_BE.DTO
 {
-    public class ExportOrder
+    public class ExportOrderDTO
     {
         public int ExportId { get; set; }
         public string ExportCode { get; set; }
@@ -14,12 +16,7 @@
         public float Paid { get; set; }
         public float InDebted { get; set; }
         public float OtherExpense { get; set; }
-        public DateTime Created { get; set; }
-        public DateTime? Approved { get; set; }
-        public DateTime? Completed { get; set; }
-        public DateTime? Denied { get; set; }
-        public virtual User User { get; set; }
-        public virtual ICollection<ExportOrderDetail> ExportOrderDetails { get; set; }
-        public virtual Supplier Supplier { get; set; }
+        public List<ExportDetailDTO> ExportOrderDetails { get; set; }
+
     }
 }

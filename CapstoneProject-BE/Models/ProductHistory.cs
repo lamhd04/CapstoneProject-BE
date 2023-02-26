@@ -8,7 +8,7 @@ namespace CapstoneProject_BE.Models
         public int ProductId { get; set; }
         public int UserId { get; set; }
         public string? OrderCode { get; set; }
-        public int ActionType { get; set; }
+        public int ActionId { get; set; }
         public DateTime Date { get; set; }
         public float? CostPrice { get; set; }
         public string? CostPriceDifferential { get; set; }
@@ -19,5 +19,6 @@ namespace CapstoneProject_BE.Models
         public string? Note { get; set; }
         [JsonIgnore]
         public virtual Product Product { get; set; }
+        public virtual ActionType ActionType { get; set; }
     }
 }

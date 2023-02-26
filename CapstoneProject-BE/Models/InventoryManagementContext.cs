@@ -20,6 +20,7 @@ namespace CapstoneProject_BE.Models
         public DbSet<ImportOrderDetail> ImportOrderDetails { get; set; }
         public DbSet<ExportOrder> ExportOrders { get; set; }
         public DbSet<ExportOrderDetail> ExportOrderDetails { get; set; }
+        public DbSet<ActionType> ActionTypes { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>(e =>
@@ -108,6 +109,9 @@ namespace CapstoneProject_BE.Models
                 e.HasMany(r => r.ImportOrderDetails)
 .WithOne(r => r.Product)
 .HasForeignKey(r => r.ProductId).OnDelete(DeleteBehavior.NoAction);
+                e.HasMany(r => r.ExportOrderDetails)
+.WithOne(r => r.Product)
+.HasForeignKey(r => r.ProductId).OnDelete(DeleteBehavior.NoAction);
                 e.Property(u => u.ProductId).UseIdentityColumn();
             });
 
@@ -126,7 +130,6 @@ namespace CapstoneProject_BE.Models
                 e.Property(u => u.TotalAmount).IsRequired();
                 e.Property(u => u.OtherExpense).HasDefaultValue(0);
                 e.Property(u => u.InDebted).HasDefaultValue(0);
-                e.Property(u => u.Discount).HasDefaultValue(0);
                 e.Property(u => u.ImportId).UseIdentityColumn();
             });
             modelBuilder.Entity<ImportOrderDetail>(e =>
@@ -134,10 +137,39 @@ namespace CapstoneProject_BE.Models
                 e.ToTable("ImportOrderDetail");
                 e.HasKey(r => r.DetailId);
                 e.HasOne(r => r.MeasuredUnit)
-                .WithMany(r => r.ImportOrderDetail)
+                .WithMany(r => r.ImportOrderDetails)
                 .HasForeignKey(r => r.MeasuredUnitId);
                 e.Property(u => u.Amount).IsRequired();
                 e.Property(u => u.CostPrice).IsRequired();
+                e.Property(u => u.ProductId).IsRequired();
+                e.Property(u => u.Discount).HasDefaultValue(0);
+                e.Property(u => u.DetailId).UseIdentityColumn();
+            });
+            modelBuilder.Entity<ExportOrder>(e =>
+            {
+                e.ToTable("ExportOrder");
+                e.HasKey(r => r.ExportId);
+                e.HasMany(r => r.ExportOrderDetails)
+                .WithOne(r => r.ExportOrder)
+                .HasForeignKey(r => r.ExportId);
+                e.HasOne(r => r.User)
+                .WithMany(r => r.ExportOrder)
+                .HasForeignKey(r => r.UserId);
+                e.Property(u => u.Paid).IsRequired();
+                e.Property(u => u.TotalPrice).IsRequired();
+                e.Property(u => u.TotalAmount).IsRequired();
+                e.Property(u => u.OtherExpense).HasDefaultValue(0);
+                e.Property(u => u.InDebted).HasDefaultValue(0);
+                e.Property(u => u.ExportId).UseIdentityColumn();
+            });
+            modelBuilder.Entity<ExportOrderDetail>(e =>
+            {
+                e.ToTable("ExportOrderDetail");
+                e.HasKey(r => r.DetailId);
+                e.HasOne(r => r.MeasuredUnit)
+                .WithMany(r => r.ExportOrderDetails)
+                .HasForeignKey(r => r.MeasuredUnitId).OnDelete(DeleteBehavior.NoAction);
+                e.Property(u => u.Amount).IsRequired();
                 e.Property(u => u.ProductId).IsRequired();
                 e.Property(u => u.Discount).HasDefaultValue(0);
                 e.Property(u => u.Price).IsRequired();
@@ -152,6 +184,17 @@ namespace CapstoneProject_BE.Models
                 .HasForeignKey(r => r.ProductId);
                 e.Property(u => u.ProductId).IsRequired();
                 e.Property(u => u.Price).IsRequired();
+                e.Property(u => u.HistoryId).UseIdentityColumn();
+            });
+            modelBuilder.Entity<ActionType>(e =>
+            {
+                e.ToTable("ActionType");
+                e.HasKey(r => r.ActionId);
+                e.HasMany(r => r.ProductHistories)
+                .WithOne(r => r.ActionType)
+                .HasForeignKey(r => r.ActionId);
+                e.Property(u => u.Action).IsRequired();
+                e.Property(u => u.ActionId).UseIdentityColumn();
             });
         }
     }

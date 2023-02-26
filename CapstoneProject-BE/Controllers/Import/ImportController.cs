@@ -28,19 +28,24 @@ namespace CapstoneProject_BE.Controllers.Import
             mapper = config.CreateMapper();
         }
         [HttpPut("UpdateImportOrder")]
-        public async Task<IActionResult> UpdateImportOrder(ExportOrderDTO p)
+        public async Task<IActionResult> UpdateImportOrder(ImportOrderDTO p)
         {
             try
             {
-
                 if (p != null)
                 {
                     var result = mapper.Map<ImportOrder>(p);
-                    result.Created = DateTime.Now;
-                    result.State = 0;
-                    _context.Update(result);
-                    await _context.SaveChangesAsync();
-                    return Ok("Thành công");
+                    if (result.State == 0)
+                    {
+                        _context.Update(result);
+                        await _context.SaveChangesAsync();
+                        return Ok("Thành công");
+                    }
+                    else
+                    {
+                        return BadRequest("Không thể chỉnh sửa phiếu này");
+                    }
+
                 }
                 else
                 {
@@ -53,7 +58,7 @@ namespace CapstoneProject_BE.Controllers.Import
             }
         }
         [HttpPost("CreateImportOrder")]
-        public async Task<IActionResult> CreateImportOrder(ExportOrderDTO p)
+        public async Task<IActionResult> CreateImportOrder(ImportOrderDTO p)
         {
             try
             {
@@ -62,7 +67,7 @@ namespace CapstoneProject_BE.Controllers.Import
                     var result = mapper.Map<Models.ImportOrder>(p);
                     result.Created = DateTime.Now;
                     result.State = 0;
-                    result.ImportCode = TokenHelper.GenerateRandomToken(16);
+                    result.ImportCode = "NAHA"+TokenHelper.GenerateNumericToken(16);
                     _context.Add(result);
                     await _context.SaveChangesAsync();
                     return Ok("Thành công");
@@ -82,7 +87,7 @@ namespace CapstoneProject_BE.Controllers.Import
         {
             try
             {
-                var result = await _context.ExportOrders.SingleOrDefaultAsync(x => x.ImportId == importid);
+                var result = await _context.ImportOrders.SingleOrDefaultAsync(x => x.ImportId == importid);
                 if (result != null&&result.State==0)
                 {
                     result.State = 1;
@@ -105,7 +110,7 @@ namespace CapstoneProject_BE.Controllers.Import
         {
             try
             {
-                var result = await _context.ExportOrders.Include(a=>a.Supplier)
+                var result = await _context.ImportOrders.Include(a=>a.Supplier)
                     .Where(x => (x.Supplier.SupplierName.Contains(code)||x.ImportCode.Contains(code)||code=="")
                 && (x.SupplierId == supId || supId == 0) && (x.State == state || state == -1)
                  ).ToListAsync();
@@ -144,7 +149,7 @@ namespace CapstoneProject_BE.Controllers.Import
         {
             try
             {
-                var result = await _context.ExportOrders
+                var result = await _context.ImportOrders
                     .Include(x=>x.ImportOrderDetails).ThenInclude(x=>x.Product).Include(x=>x.Supplier).Include(x=>x.User)
                     .SingleOrDefaultAsync(x => x.ImportId == importid);
                 if (result != null)
@@ -166,7 +171,7 @@ namespace CapstoneProject_BE.Controllers.Import
         {
             try
             {
-                var result = await _context.ExportOrders.SingleOrDefaultAsync(x => x.ImportId == importid);
+                var result = await _context.ImportOrders.SingleOrDefaultAsync(x => x.ImportId == importid);
                 if (result != null&&result.State==0)
                 {
                     result.State = 3;
@@ -189,7 +194,7 @@ namespace CapstoneProject_BE.Controllers.Import
         {
             try
             {
-                var result = await _context.ExportOrders.Include(a => a.ImportOrderDetails).SingleOrDefaultAsync(x => x.ImportId == importid);
+                var result = await _context.ImportOrders.Include(a => a.ImportOrderDetails).SingleOrDefaultAsync(x => x.ImportId == importid);
                 if (result != null && result.State == 1)
                 {
                     result.State = 2;
@@ -200,7 +205,7 @@ namespace CapstoneProject_BE.Controllers.Import
                         var history = new ProductHistory
                         {
                             ProductId = product.ProductId,
-                            ActionType = 1
+                            ActionId = 1
                         };
                         int total = 0;
                         if (detail.MeasuredUnitId != null)
@@ -217,13 +222,9 @@ namespace CapstoneProject_BE.Controllers.Import
                         }
                         history.AmountDifferential = $"+{total}";
                         history.CostPrice = product.CostPrice;
-                        history.Price = product.SellingPrice;
                         product.CostPrice = (detail.Amount*detail.CostPrice + product.InStock * product.CostPrice) / (total + product.InStock);
-                        product.SellingPrice = (detail.Amount *detail.Price + product.InStock * product.SellingPrice) / (total + product.InStock);
                         var costdifferential = product.CostPrice - history.CostPrice;
-                        var pricedifferential = product.SellingPrice - history.Price;
                         history.CostPriceDifferential = costdifferential > 0 ? $"+{costdifferential}" : $"-{costdifferential}";
-                        history.PriceDifferential = pricedifferential > 0 ? $"+{pricedifferential}" : $"-{pricedifferential}";
                         history.Amount = product.InStock;
                         history.Date = DateTime.Now;
                         _context.Add(history);

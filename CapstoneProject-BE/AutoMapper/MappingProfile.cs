@@ -36,11 +36,17 @@ namespace CapstoneProject_BE.AutoMapper
                 map => map.MapFrom(
                     c => c.Ward == "" ? null : JsonSerializer.Deserialize<Ward>(c.Ward, new JsonSerializerOptions())
                     ));
-            CreateMap<ExportOrderDTO, ImportOrder>();
+            CreateMap<ImportOrderDTO, ImportOrder>();
             CreateMap<ImportDetailDTO, ImportOrderDetail>()
                                 .ForMember(cdto => cdto.MeasuredUnitId,
                 map => map.MapFrom(
                     c => c.MeasuredUnitId==0? null:c.MeasuredUnitId
+                    ));
+            CreateMap<ExportOrderDTO, ExportOrder>();
+            CreateMap<ExportDetailDTO, ExportOrderDetail>()
+                                .ForMember(cdto => cdto.MeasuredUnitId,
+                map => map.MapFrom(
+                    c => c.MeasuredUnitId == 0 ? null : c.MeasuredUnitId
                     ));
         }
     }

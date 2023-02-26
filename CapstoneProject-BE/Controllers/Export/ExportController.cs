@@ -55,7 +55,7 @@ namespace CapstoneProject_BE.Controllers.Export
             {
                 if (p != null)
                 {
-                    var result = mapper.Map<Models.ExportOrder>(p);
+                    var result = mapper.Map<ExportOrder>(p);
                     result.Created = DateTime.Now;
                     result.State = 0;
                     result.ExportCode = TokenHelper.GenerateRandomToken(16);
@@ -158,7 +158,7 @@ namespace CapstoneProject_BE.Controllers.Export
             }
         }
         [HttpPost("DenyImport")]
-        public async Task<IActionResult> DenyImport(int exportId)
+        public async Task<IActionResult> DenyExport(int exportId)
         {
             try
             {
@@ -196,29 +196,29 @@ namespace CapstoneProject_BE.Controllers.Export
                         var history = new ProductHistory
                         {
                             ProductId = product.ProductId,
-                            ActionType = 1
+                            ActionId = 1
                         };
                         int total = 0;
                         if (detail.MeasuredUnitId != null)
                         {
                             detail.MeasuredUnit = await _context.MeasuredUnits.SingleOrDefaultAsync(x => x.MeasuredUnitId == detail.MeasuredUnitId);
                             total = detail.Amount * detail.MeasuredUnit.MeasuredUnitValue;
-                            product.InStock += total;
+                            if (total > product.InStock)
+                                return BadRequest("Số lượng xuất lớn hơn tồn kho");
+                            product.InStock -= total;
                         }
                         else
                         {
                             total = detail.Amount;
-                            history.AmountDifferential = $"+{detail.Amount}";
-                            product.InStock += total;
+                            history.AmountDifferential = $"-{detail.Amount}";
+                            if (total > product.InStock)
+                                return BadRequest("Số lượng xuất lớn hơn tồn kho");
+                            product.InStock -= total;
                         }
-                        history.AmountDifferential = $"+{total}";
-                        history.CostPrice = product.CostPrice;
+                        history.AmountDifferential = $"-{total}";
                         history.Price = product.SellingPrice;
-                        product.CostPrice = (detail.Amount * detail.CostPrice + product.InStock * product.CostPrice) / (total + product.InStock);
                         product.SellingPrice = (detail.Amount * detail.Price + product.InStock * product.SellingPrice) / (total + product.InStock);
-                        var costdifferential = product.CostPrice - history.CostPrice;
                         var pricedifferential = product.SellingPrice - history.Price;
-                        history.CostPriceDifferential = costdifferential > 0 ? $"+{costdifferential}" : $"-{costdifferential}";
                         history.PriceDifferential = pricedifferential > 0 ? $"+{pricedifferential}" : $"-{pricedifferential}";
                         history.Amount = product.InStock;
                         history.Date = DateTime.Now;
