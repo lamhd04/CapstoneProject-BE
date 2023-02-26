@@ -29,11 +29,10 @@ namespace CapstoneProject_BE.Controllers.Export
             try
             {
 
-                if (p != null)
+                if (p != null&&p.State==0)
                 {
                     var result = mapper.Map<ExportOrder>(p);
                     result.Created = DateTime.Now;
-                    result.State = 0;
                     _context.Update(result);
                     await _context.SaveChangesAsync();
                     return Ok("Thành công");
@@ -58,7 +57,7 @@ namespace CapstoneProject_BE.Controllers.Export
                     var result = mapper.Map<ExportOrder>(p);
                     result.Created = DateTime.Now;
                     result.State = 0;
-                    result.ExportCode = TokenHelper.GenerateRandomToken(16);
+                    result.ExportCode ="XAHA"+TokenHelper.GenerateNumericToken(16);
                     _context.Add(result);
                     await _context.SaveChangesAsync();
                     return Ok("Thành công");
