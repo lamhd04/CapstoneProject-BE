@@ -10,9 +10,6 @@
         public float TotalPrice { get; set; }
         public string? Note { get; set; }
         public int State { get; set; }
-        public float Paid { get; set; }
-        public float InDebted { get; set; }
-        public float OtherExpense { get; set; }
         public DateTime Created { get; set; }
         public DateTime? Approved { get; set; }
         public DateTime? Completed { get; set; }

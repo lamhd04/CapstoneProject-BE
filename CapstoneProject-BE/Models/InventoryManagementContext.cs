@@ -155,11 +155,8 @@ namespace CapstoneProject_BE.Models
                 e.HasOne(r => r.User)
                 .WithMany(r => r.ExportOrder)
                 .HasForeignKey(r => r.UserId);
-                e.Property(u => u.Paid).IsRequired();
                 e.Property(u => u.TotalPrice).IsRequired();
                 e.Property(u => u.TotalAmount).IsRequired();
-                e.Property(u => u.OtherExpense).HasDefaultValue(0);
-                e.Property(u => u.InDebted).HasDefaultValue(0);
                 e.Property(u => u.ExportId).UseIdentityColumn();
             });
             modelBuilder.Entity<ExportOrderDetail>(e =>
