@@ -100,9 +100,9 @@ namespace CapstoneProject_BE.Controllers.Export
         {
             try
             {
-                var result = await _context.ExportOrders.Include(a => a.Supplier)
-                    .Where(x => (x.Supplier.SupplierName.Contains(code) || x.ExportCode.Contains(code) || code == "")
-                && (x.SupplierId == supId || supId == 0) && (x.State == state || state == -1)
+                var result = await _context.ExportOrders
+                    .Where(x => (x.ExportCode.Contains(code) || code == "")
+                 && (x.State == state || state == -1)
                  ).ToListAsync();
                 if (limit > result.Count() && offset >= 0)
                 {
@@ -140,7 +140,7 @@ namespace CapstoneProject_BE.Controllers.Export
             try
             {
                 var result = await _context.ExportOrders
-                    .Include(x => x.ExportOrderDetails).ThenInclude(x => x.Product).Include(x => x.Supplier).Include(x => x.User)
+                    .Include(x => x.ExportOrderDetails).ThenInclude(x => x.Product).Include(x => x.User)
                     .SingleOrDefaultAsync(x => x.ExportId == exportId);
                 if (result != null)
                 {
