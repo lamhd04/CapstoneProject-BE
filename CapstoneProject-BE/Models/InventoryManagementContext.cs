@@ -18,6 +18,8 @@ namespace CapstoneProject_BE.Models
         public DbSet<MeasuredUnit> MeasuredUnits { get; set; }
         public DbSet<ImportOrder> ImportOrders { get; set; }
         public DbSet<ImportOrderDetail> ImportOrderDetails { get; set; }
+        public DbSet<ExportOrder> ExportOrders { get; set; }
+        public DbSet<ExportOrderDetail> ExportOrderDetails { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>(e =>

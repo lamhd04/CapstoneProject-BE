@@ -5,6 +5,7 @@
         public int ExportId { get; set; }
         public string ExportCode { get; set; }
         public int UserId { get; set; }
+        public int SupplierId { get; set; }
         public int TotalAmount { get; set; }
         public float Total { get; set; }
         public float TotalCost { get; set; }

@@ -2,7 +2,7 @@
 
 namespace CapstoneProject_BE.DTO
 {
-    public class ImportOrderDTO
+    public class ExportOrderDTO
     {
         public int ImportId { get; set; }
         public string? ImportCode { get; set; }
