@@ -34,9 +34,13 @@ namespace CapstoneProject_BE.Controllers.Import
             {
                 if (p != null)
                 {
+                    var dbimport = _context.ImportOrders.Include(a => a.ImportOrderDetails).SingleOrDefault(a => a.ImportId == p.ImportId);
                     var result = mapper.Map<ImportOrder>(p);
-                    if (result.State == 0)
+                    if (dbimport.State == 0)
                     {
+                        _context.RemoveRange(dbimport.ImportOrderDetails);
+                        await _context.SaveChangesAsync();
+                        _context.ChangeTracker.Clear();
                         _context.Update(result);
                         await _context.SaveChangesAsync();
                         return Ok("Thành công");
@@ -45,12 +49,24 @@ namespace CapstoneProject_BE.Controllers.Import
                     {
                         return BadRequest("Không thể chỉnh sửa phiếu này");
                     }
-
                 }
                 else
                 {
                     return BadRequest("Không có dữ liệu");
                 }
+            }
+            catch
+            {
+                return StatusCode(500);
+            }
+        }
+        [HttpPut("a")]
+        public async Task<IActionResult> a(int b)
+        {
+            try
+            {
+                        var dbimport = _context.ImportOrders.Include(a=>a.ImportOrderDetails).SingleOrDefault(a=>a.ImportId==b);
+                return Ok(dbimport);
             }
             catch
             {

@@ -29,13 +29,23 @@ namespace CapstoneProject_BE.Controllers.Export
             try
             {
 
-                if (p != null&&p.State==0)
+                if (p != null)
                 {
+                    var dbimport = _context.ExportOrders.Include(a => a.ExportOrderDetails).SingleOrDefault(a => a.ExportId == p.ExportId);
                     var result = mapper.Map<ExportOrder>(p);
-                    result.Created = DateTime.Now;
-                    _context.Update(result);
-                    await _context.SaveChangesAsync();
-                    return Ok("Thành công");
+                    if (dbimport.State == 0)
+                    {
+                        _context.RemoveRange(dbimport.ExportOrderDetails);
+                        await _context.SaveChangesAsync();
+                        _context.ChangeTracker.Clear();
+                        _context.Update(result);
+                        await _context.SaveChangesAsync();
+                        return Ok("Thành công");
+                    }
+                    else
+                    {
+                        return BadRequest("Không thể chỉnh sửa phiếu này");
+                    }
                 }
                 else
                 {
