@@ -246,6 +246,7 @@ namespace CapstoneProject_BE.Controllers.Import
                             history.CostPriceDifferential = $"-{costdifferential}";
                         else
                             history.CostPriceDifferential = null;
+                        history.UserId = result.UserId;
                         history.Amount = product.InStock;
                         history.Date = DateTime.Now;
                         _context.Add(history);

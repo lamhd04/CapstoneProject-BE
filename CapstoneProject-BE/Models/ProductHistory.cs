@@ -20,5 +20,6 @@ namespace CapstoneProject_BE.Models
         [JsonIgnore]
         public virtual Product Product { get; set; }
         public virtual ActionType ActionType { get; set; }
+        public virtual User User { get; set; }
     }
 }

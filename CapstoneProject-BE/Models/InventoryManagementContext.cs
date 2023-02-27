@@ -30,6 +30,9 @@ namespace CapstoneProject_BE.Models
                 e.HasOne(u => u.Role)
                 .WithMany(u => u.Users)
                 .HasForeignKey(u => u.RoleId);
+                e.HasMany(u => u.ProductHistories)
+                .WithOne(u => u.User)
+                .HasForeignKey(u => u.UserId);
                 e.Property(u => u.Email).IsRequired();
                 e.Property(u => u.Password).IsRequired();
                 e.Property(u => u.RoleId).HasDefaultValue(0);

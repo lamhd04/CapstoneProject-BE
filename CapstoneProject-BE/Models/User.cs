@@ -15,6 +15,8 @@ namespace CapstoneProject_BE.Models
         public virtual ICollection<ImportOrder> ImportOrder { get; set; }
         [JsonIgnore]
         public virtual ICollection<ExportOrder> ExportOrder { get; set; }
+        [JsonIgnore]
+        public virtual ICollection<ProductHistory> ProductHistories { get; set; }
         public virtual Role Role { get; set; }
         public virtual RefreshToken RefreshToken { get; set; }  
         public virtual ICollection<EmailToken> EmailTokens { get; set; }

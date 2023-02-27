@@ -234,6 +234,7 @@ namespace CapstoneProject_BE.Controllers.Export
                             history.PriceDifferential = $"-{pricedifferential}";
                         else
                             history.PriceDifferential = null;
+                        history.UserId = result.UserId;
                         history.Amount = product.InStock;
                         history.Date = DateTime.Now;
                         _context.Add(history);
