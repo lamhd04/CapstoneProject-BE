@@ -150,7 +150,7 @@ namespace CapstoneProject_BE.Controllers.Import
             try
             {
                 var result = await _context.ImportOrders
-                    .Include(x=>x.ImportOrderDetails).ThenInclude(x=>x.Product).Include(x=>x.Supplier).Include(x=>x.User)
+                    .Include(x=>x.ImportOrderDetails).ThenInclude(x=>x.Product).ThenInclude(x=>x.MeasuredUnits).Include(x=>x.Supplier).Include(x=>x.User)
                     .SingleOrDefaultAsync(x => x.ImportId == importid);
                 if (result != null)
                 {
