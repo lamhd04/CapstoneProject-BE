@@ -228,7 +228,12 @@ namespace CapstoneProject_BE.Controllers.Export
                         history.Price = product.SellingPrice;
                         product.SellingPrice = (detail.Amount * detail.Price + product.InStock * product.SellingPrice) / (total + product.InStock);
                         var pricedifferential = product.SellingPrice - history.Price;
-                        history.PriceDifferential = pricedifferential > 0 ? $"+{pricedifferential}" : $"-{pricedifferential}";
+                        if (pricedifferential > 0)
+                            history.PriceDifferential = $"+{pricedifferential}";
+                        else if (pricedifferential < 0)
+                            history.PriceDifferential = $"-{pricedifferential}";
+                        else
+                            history.PriceDifferential = null;
                         history.Amount = product.InStock;
                         history.Date = DateTime.Now;
                         _context.Add(history);

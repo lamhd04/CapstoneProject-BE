@@ -240,7 +240,12 @@ namespace CapstoneProject_BE.Controllers.Import
                         history.CostPrice = product.CostPrice;
                         product.CostPrice = (detail.Amount*detail.CostPrice + product.InStock * product.CostPrice) / (total + product.InStock);
                         var costdifferential = product.CostPrice - history.CostPrice;
-                        history.CostPriceDifferential = costdifferential > 0 ? $"+{costdifferential}" : $"-{costdifferential}";
+                        if (costdifferential > 0)
+                            history.CostPriceDifferential = $"+{costdifferential}";
+                        else if (costdifferential < 0)
+                            history.CostPriceDifferential = $"-{costdifferential}";
+                        else
+                            history.CostPriceDifferential = null;
                         history.Amount = product.InStock;
                         history.Date = DateTime.Now;
                         _context.Add(history);

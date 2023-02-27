@@ -8,5 +8,5 @@
         public int Amount { get; set; }
         public float CostPrice { get; set; }
         public float Discount { get; set; }
-        public float Price { get; set; }    }
+    }
 }
