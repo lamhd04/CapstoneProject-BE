@@ -150,7 +150,7 @@ namespace CapstoneProject_BE.Controllers.Export
             try
             {
                 var result = await _context.ExportOrders
-                    .Include(x => x.ExportOrderDetails).ThenInclude(x => x.Product).Include(x => x.User)
+                    .Include(x => x.ExportOrderDetails).ThenInclude(x => x.Product).ThenInclude(x=>x.MeasuredUnits).Include(x => x.User)
                     .SingleOrDefaultAsync(x => x.ExportId == exportId);
                 if (result != null)
                 {
