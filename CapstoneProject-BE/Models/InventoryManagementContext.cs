@@ -20,7 +20,10 @@ namespace CapstoneProject_BE.Models
         public DbSet<ImportOrderDetail> ImportOrderDetails { get; set; }
         public DbSet<ExportOrder> ExportOrders { get; set; }
         public DbSet<ExportOrderDetail> ExportOrderDetails { get; set; }
+        public DbSet<StocktakeNote> StocktakeNotes { get; set; }
+        public DbSet<StocktakeNoteDetail> StocktakeNoteDetails { get; set; }
         public DbSet<ActionType> ActionTypes { get; set; }
+        public DbSet<Storage> Storages { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>(e =>
@@ -175,6 +178,30 @@ namespace CapstoneProject_BE.Models
                 e.Property(u => u.Price).IsRequired();
                 e.Property(u => u.DetailId).UseIdentityColumn();
             });
+            modelBuilder.Entity<StocktakeNote>(e =>
+            {
+                e.ToTable("StocktakeNote");
+                e.HasKey(r => r.StocktakeId);
+                e.HasMany(r => r.StocktakeNoteDetails)
+                .WithOne(r => r.StocktakeNote)
+                .HasForeignKey(r => r.StocktakeId);
+                e.HasOne(r => r.CreatedBy)
+                .WithMany(r => r.CreatedStocktakeNotes)
+                .HasForeignKey(r => r.CreatedId);
+                e.HasOne(r => r.UpdatedBy)
+.WithMany(r => r.UpdatedStocktakeNotes)
+.HasForeignKey(r => r.UpdatedId).OnDelete(DeleteBehavior.NoAction);
+                e.Property(u => u.StocktakeId).UseIdentityColumn();
+            });
+            modelBuilder.Entity<StocktakeNoteDetail>(e =>
+            {
+                e.ToTable("StocktakeNoteDetail");
+                e.HasKey(r => r.DetailId);
+                e.HasOne(r => r.MeasuredUnit)
+                .WithMany(r => r.StocktakeNoteDetails)
+                .HasForeignKey(r => r.MeasuredUnitId).OnDelete(DeleteBehavior.NoAction);
+                e.Property(u => u.DetailId).UseIdentityColumn();
+            });
             modelBuilder.Entity<ProductHistory>(e =>
             {
                 e.ToTable("ProductHistory");
@@ -195,6 +222,33 @@ namespace CapstoneProject_BE.Models
                 .HasForeignKey(r => r.ActionId);
                 e.Property(u => u.Action).IsRequired();
                 e.Property(u => u.ActionId).UseIdentityColumn();
+            });
+            modelBuilder.Entity<Storage>(e =>
+            {
+                e.ToTable("Storage");
+                e.HasKey(r => r.StorageId);
+                e.HasMany(r => r.Users)
+                .WithOne(r => r.Storage)
+                .HasForeignKey(r => r.StorageId).OnDelete(DeleteBehavior.NoAction);
+                e.HasMany(r => r.Suppliers)
+.WithOne(r => r.Storage)
+.HasForeignKey(r => r.StorageId).OnDelete(DeleteBehavior.NoAction);
+                e.HasMany(r => r.ImportOrders)
+.WithOne(r => r.Storage)
+.HasForeignKey(r => r.StorageId).OnDelete(DeleteBehavior.NoAction);
+                e.HasMany(r => r.ExportOrders)
+.WithOne(r => r.Storage)
+.HasForeignKey(r => r.StorageId).OnDelete(DeleteBehavior.NoAction);
+                e.HasMany(r => r.Products)
+.WithOne(r => r.Storage)
+.HasForeignKey(r => r.StorageId).OnDelete(DeleteBehavior.NoAction);
+                e.HasMany(r => r.Categories)
+.WithOne(r => r.Storage)
+.HasForeignKey(r => r.StorageId).OnDelete(DeleteBehavior.NoAction);
+                e.HasMany(r => r.StocktakeNotes)
+.WithOne(r => r.Storage)
+.HasForeignKey(r => r.StorageId).OnDelete(DeleteBehavior.NoAction);
+                e.Property(u => u.StorageId).UseIdentityColumn();
             });
         }
     }

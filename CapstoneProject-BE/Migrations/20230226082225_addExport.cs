@@ -83,7 +83,7 @@ namespace CapstoneProject_BE.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ExportId = table.Column<int>(type: "int", nullable: false),
                     ProductId = table.Column<int>(type: "int", nullable: false),
-                    MeasuredUnitId = table.Column<int>(type: "int", nullable: false),
+                    MeasuredUnitId = table.Column<int>(type: "int", nullable: true),
                     Amount = table.Column<int>(type: "int", nullable: false),
                     Discount = table.Column<float>(type: "real", nullable: false, defaultValue: 0f),
                     Price = table.Column<float>(type: "real", nullable: false)

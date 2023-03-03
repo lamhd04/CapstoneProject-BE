@@ -20,7 +20,7 @@ namespace CapstoneProject_BE.Migrations
                     Date = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CostPrice = table.Column<float>(type: "real", nullable: true),
                     CostPriceDifferential = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Price = table.Column<float>(type: "real", nullable: false),
+                    Price = table.Column<float>(type: "real", nullable: true),
                     PriceDifferential = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Amount = table.Column<int>(type: "int", nullable: true),
                     AmountDifferential = table.Column<string>(type: "nvarchar(max)", nullable: true),

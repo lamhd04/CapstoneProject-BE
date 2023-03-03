@@ -195,9 +195,9 @@ namespace CapstoneProject_BE.Controllers.Authentication
         {
             try
             {
-                
+
                 var user = await _context.Users.SingleOrDefaultAsync(u => u.Email == model.Email);
-                if (user == null&& Constant.validateGuidRegex.IsMatch(model.Password))
+                if (user == null && Constant.validateGuidRegex.IsMatch(model.Password))
                 {
                     var token = TokenHelper.GenerateRandomToken(64);
                     MailMessage mm = new MailMessage("nguyendailam04@gmail.com", model.Email);
@@ -218,15 +218,20 @@ namespace CapstoneProject_BE.Controllers.Authentication
                     smtp.Credentials = NetworkCred;
                     smtp.Port = 587;
                     smtp.Send(mm);
+                    var newstorage = new Storage
+                    {
+                        StorageName = "KHO" + _context.Storages.Count() + 1
+                    };
+                    _context.Add(newstorage);
+                    await _context.SaveChangesAsync();
                     var newuser = new User
                     {
+                        StorageId = newstorage.StorageId,
                         Email = model.Email,
                         Password = HashHelper.Encrypt(model.Password, _configuration),
                         RoleId = 1,
                         UserName = TokenHelper.GenerateRandomToken(8)
                     };
-                    _context.Users.Add(newuser);
-                    await _context.SaveChangesAsync();
                     var emailtoken = new EmailToken
                     {
                         Token = token,
@@ -234,7 +239,7 @@ namespace CapstoneProject_BE.Controllers.Authentication
                         ExpiredAt = DateTime.UtcNow.AddDays(1),
                         IsRevoked = false,
                         IsUsed = false,
-                        UserId=newuser.UserId
+                        UserId = newuser.UserId
                     };
                     _context.Add(emailtoken);
                     await _context.SaveChangesAsync();
@@ -249,8 +254,9 @@ namespace CapstoneProject_BE.Controllers.Authentication
             {
                 return StatusCode(500);
             }
-
         }
+
+        
 
 
 
@@ -287,6 +293,7 @@ namespace CapstoneProject_BE.Controllers.Authentication
                         new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                         new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
                         new Claim("UserId", user.UserId.ToString()),
+                        new Claim("StorageId", user.StorageId.ToString()),
                     };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));

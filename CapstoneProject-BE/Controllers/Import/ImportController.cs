@@ -34,7 +34,8 @@ namespace CapstoneProject_BE.Controllers.Import
             {
                 if (p != null)
                 {
-                    var dbimport = _context.ImportOrders.Include(a => a.ImportOrderDetails).SingleOrDefault(a => a.ImportId == p.ImportId);
+                    //var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
+                    var dbimport = _context.ImportOrders.Include(a => a.ImportOrderDetails).SingleOrDefault(a => a.ImportId == p.ImportId&&a.StorageId==1);
                     var result = mapper.Map<ImportOrder>(p);
                     if (dbimport.State == 0)
                     {
@@ -78,12 +79,14 @@ namespace CapstoneProject_BE.Controllers.Import
         {
             try
             {
+                //var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
                 if (p != null)
                 {
                     var result = mapper.Map<Models.ImportOrder>(p);
                     result.Created = DateTime.Now;
                     result.State = 0;
-                    result.ImportCode = "NAHA"+TokenHelper.GenerateNumericToken(16);
+                    result.ImportCode = "NAHA" + _context.ImportOrders.Where(x=>x.StorageId==1).Count()+1;
+                    result.StorageId = 1;
                     _context.Add(result);
                     await _context.SaveChangesAsync();
                     return Ok("Thành công");
@@ -165,9 +168,11 @@ namespace CapstoneProject_BE.Controllers.Import
         {
             try
             {
+                //var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
                 var result = await _context.ImportOrders
                     .Include(x=>x.ImportOrderDetails).ThenInclude(x=>x.Product).ThenInclude(x=>x.MeasuredUnits).Include(x=>x.Supplier).Include(x=>x.User)
-                    .SingleOrDefaultAsync(x => x.ImportId == importid);
+                    .SingleOrDefaultAsync(x => x.ImportId == importid&&x.StorageId==1);
+                
                 if (result != null)
                 {
                     return Ok(result);
@@ -191,7 +196,7 @@ namespace CapstoneProject_BE.Controllers.Import
                 if (result != null&&result.State==0)
                 {
                     result.State = 3;
-                    result.Approved = DateTime.Now;
+                    result.Denied = DateTime.Now;
                     await _context.SaveChangesAsync();
                     return Ok("Thành công");
                 }
@@ -210,7 +215,8 @@ namespace CapstoneProject_BE.Controllers.Import
         {
             try
             {
-                var result = await _context.ImportOrders.Include(a => a.ImportOrderDetails).SingleOrDefaultAsync(x => x.ImportId == importid);
+                //var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
+                var result = await _context.ImportOrders.Include(a => a.ImportOrderDetails).SingleOrDefaultAsync(x => x.ImportId == importid&&x.StorageId==1);
                 if (result != null && result.State == 1)
                 {
                     result.State = 2;

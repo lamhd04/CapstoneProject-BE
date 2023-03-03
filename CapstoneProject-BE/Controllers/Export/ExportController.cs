@@ -205,7 +205,7 @@ namespace CapstoneProject_BE.Controllers.Export
                         var history = new ProductHistory
                         {
                             ProductId = product.ProductId,
-                            ActionId = 1
+                            ActionId = 2
                         };
                         int total = 0;
                         if (detail.MeasuredUnitId != null)

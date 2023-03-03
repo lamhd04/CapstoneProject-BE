@@ -21,5 +21,7 @@
         public virtual User User { get; set; }
         public virtual ICollection<ImportOrderDetail> ImportOrderDetails { get; set; }
         public virtual Supplier Supplier { get; set; }
+        public int StorageId { get; set; }
+        public Storage Storage { get; set; }
     }
 }

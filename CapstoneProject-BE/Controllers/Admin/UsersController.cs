@@ -1,4 +1,5 @@
 ﻿using CapstoneProject_BE.DTO;
+using CapstoneProject_BE.Helper;
 using CapstoneProject_BE.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -23,6 +24,30 @@ namespace CapstoneProject_BE.Controllers.Admin
             try
             {
                 return Ok(await _context.Users.ToListAsync());
+            }
+            catch
+            {
+                return StatusCode(500);
+            }
+
+        }
+        [HttpPost("CreateStaff")]
+        public async Task<IActionResult> CreateStaff()
+        {
+            try
+            {
+                var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
+                var user = new User
+                {
+                    StorageId = storageid,
+                    UserCode = storageid + TokenHelper.GenerateRandomToken(4),
+                    Password = "Nhanvien" + storageid,
+                    Status = true,
+                    RoleId=3
+                };
+                _context.Add(user);
+                await _context.SaveChangesAsync();
+                return Ok();
             }
             catch
             {

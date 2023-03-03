@@ -41,7 +41,7 @@ namespace CapstoneProject_BE.Migrations
                 {
                     ImportId = table.Column<int>(type: "int", nullable: false),
                     ProductId = table.Column<int>(type: "int", nullable: false),
-                    MeasuredUnitId = table.Column<int>(type: "int", nullable: false),
+                    MeasuredUnitId = table.Column<int>(type: "int", nullable: true),
                     Amount = table.Column<int>(type: "int", nullable: false),
                     CostPrice = table.Column<float>(type: "real", nullable: false),
                     Discount = table.Column<float>(type: "real", nullable: false, defaultValue: 0f),

@@ -29,7 +29,8 @@ namespace CapstoneProject_BE.Controllers.Product
         {
             try
             {
-                var result = await _context.Suppliers.SingleOrDefaultAsync(x => x.SupplierId == supId);
+                //var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
+                var result = await _context.Suppliers.SingleOrDefaultAsync(x => x.SupplierId == supId&&x.StorageId==1);
                 if (result != null)
                 {
                     _context.Remove(result);
@@ -52,9 +53,11 @@ namespace CapstoneProject_BE.Controllers.Product
         {
             try
             {
+                //var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
                 if (s != null)
                 {
                     var result=mapper.Map<Supplier>(s);
+                    result.StorageId = 1;
                     _context.Add(result);
                     await _context.SaveChangesAsync();
                     return Ok("Thành công");
@@ -75,12 +78,12 @@ namespace CapstoneProject_BE.Controllers.Product
         {
             try
             {
-                var editSupplier = await _context.Suppliers.SingleOrDefaultAsync(x => x.SupplierId == s.SupplierId);
+                //var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
+                var editSupplier = await _context.Suppliers.SingleOrDefaultAsync(x => x.SupplierId == s.SupplierId&&x.StorageId==1);
                 if (editSupplier != null)
                 {
-                    _context.Entry(editSupplier).State = EntityState.Detached;
                     editSupplier=mapper.Map<Supplier>(s);
-                    _context.Update(s);
+                    _context.Update(editSupplier);
                     await _context.SaveChangesAsync();
                     return Ok("Thành công");
 
@@ -101,9 +104,10 @@ namespace CapstoneProject_BE.Controllers.Product
         {
             try
             {
+                //var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
                 var result = await _context.Suppliers
                     .Where(x => x.SupplierName.Contains(search)
-                ).ToListAsync();
+                &&x.StorageId==1).ToListAsync();
                 if (limit > result.Count() && offset >= 0)
                 {
                     return Ok(new ResponseData<Supplier>
@@ -140,7 +144,8 @@ namespace CapstoneProject_BE.Controllers.Product
         {
             try
             {
-                var supplier = await _context.Suppliers.SingleOrDefaultAsync(x=>x.SupplierId==supId);
+                //var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
+                var supplier = await _context.Suppliers.SingleOrDefaultAsync(x=>x.SupplierId==supId&&x.StorageId==1);
                 if (supplier != null)
                 {
                     var result = mapper.Map<SupplierDTO>(supplier);                

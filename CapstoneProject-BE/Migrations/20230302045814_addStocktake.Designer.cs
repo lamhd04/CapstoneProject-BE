@@ -4,6 +4,7 @@ using CapstoneProject_BE.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CapstoneProject_BE.Migrations
 {
     [DbContext(typeof(InventoryManagementContext))]
-    partial class InventoryManagementContextModelSnapshot : ModelSnapshot
+    [Migration("20230302045814_addStocktake")]
+    partial class addStocktake
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -528,18 +530,11 @@ namespace CapstoneProject_BE.Migrations
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("CreatedId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Note")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("State")
                         .HasColumnType("int");
-
-                    b.Property<string>("StocktakeCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("StorageId")
                         .HasColumnType("int");
@@ -547,16 +542,14 @@ namespace CapstoneProject_BE.Migrations
                     b.Property<DateTime?>("Updated")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("UpdatedId")
+                    b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("StocktakeId");
 
-                    b.HasIndex("CreatedId");
-
                     b.HasIndex("StorageId");
 
-                    b.HasIndex("UpdatedId");
+                    b.HasIndex("UserId");
 
                     b.ToTable("StocktakeNote", (string)null);
                 });
@@ -702,9 +695,6 @@ namespace CapstoneProject_BE.Migrations
 
                     b.Property<int>("StorageId")
                         .HasColumnType("int");
-
-                    b.Property<string>("UserCode")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserName")
                         .HasColumnType("nvarchar(max)");
@@ -918,29 +908,21 @@ namespace CapstoneProject_BE.Migrations
 
             modelBuilder.Entity("CapstoneProject_BE.Models.StocktakeNote", b =>
                 {
-                    b.HasOne("CapstoneProject_BE.Models.User", "CreatedBy")
-                        .WithMany("CreatedStocktakeNotes")
-                        .HasForeignKey("CreatedId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("CapstoneProject_BE.Models.Storage", "Storage")
                         .WithMany("StocktakeNotes")
                         .HasForeignKey("StorageId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("CapstoneProject_BE.Models.User", "UpdatedBy")
-                        .WithMany("UpdatedStocktakeNotes")
-                        .HasForeignKey("UpdatedId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                    b.HasOne("CapstoneProject_BE.Models.User", "User")
+                        .WithMany("StocktakeNotes")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("CreatedBy");
 
                     b.Navigation("Storage");
 
-                    b.Navigation("UpdatedBy");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("CapstoneProject_BE.Models.StocktakeNoteDetail", b =>
@@ -1076,8 +1058,6 @@ namespace CapstoneProject_BE.Migrations
 
             modelBuilder.Entity("CapstoneProject_BE.Models.User", b =>
                 {
-                    b.Navigation("CreatedStocktakeNotes");
-
                     b.Navigation("EmailTokens");
 
                     b.Navigation("ExportOrder");
@@ -1089,7 +1069,7 @@ namespace CapstoneProject_BE.Migrations
                     b.Navigation("RefreshToken")
                         .IsRequired();
 
-                    b.Navigation("UpdatedStocktakeNotes");
+                    b.Navigation("StocktakeNotes");
                 });
 #pragma warning restore 612, 618
         }

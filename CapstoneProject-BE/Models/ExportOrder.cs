@@ -16,5 +16,7 @@
         public DateTime? Denied { get; set; }
         public virtual User User { get; set; }
         public virtual ICollection<ExportOrderDetail> ExportOrderDetails { get; set; }
+        public int StorageId { get; set; }
+        public Storage Storage { get; set; }
     }
 }

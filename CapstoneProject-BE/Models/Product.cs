@@ -29,6 +29,8 @@ namespace CapstoneProject_BE.Models
         public Category Category { get; set; }
         public Supplier Supplier { get; set; }
         public string? Barcode { get; set; }
+        public int StorageId { get; set; }
+        public Storage Storage { get; set; }
 
     }
 }

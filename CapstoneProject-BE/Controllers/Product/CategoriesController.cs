@@ -23,7 +23,8 @@ namespace CapstoneProject_BE.Controllers.Product
         {
             try
             {
-                var result = await _context.Categories.SingleOrDefaultAsync(x => x.CategoryId == catId);
+                //var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
+                var result = await _context.Categories.SingleOrDefaultAsync(x => x.CategoryId == catId && x.StorageId == 1);
                 if (result != null)
                 {
                     _context.Remove(result);
@@ -46,9 +47,10 @@ namespace CapstoneProject_BE.Controllers.Product
         {
             try
             {
-
+                //var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
                 if (c != null)
                 {
+                    c.StorageId = 1;
                     _context.Add(c);
                     await _context.SaveChangesAsync();
                     return Ok("Thành công");
@@ -69,7 +71,8 @@ namespace CapstoneProject_BE.Controllers.Product
         {
             try
             {
-                var editProduct = await _context.Categories.SingleOrDefaultAsync(x => x.CategoryId == c.CategoryId);
+                //var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
+                var editProduct = await _context.Categories.SingleOrDefaultAsync(x => x.CategoryId == c.CategoryId && x.StorageId == 1);
                 if (editProduct != null)
                 {
                     editProduct.CategoryName = c.CategoryName;
@@ -94,9 +97,10 @@ namespace CapstoneProject_BE.Controllers.Product
         {
             try
             {
+                //var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
                 var result = await _context.Categories
                     .Where(x =>x.CategoryName.Contains(search)
-                ).ToListAsync();
+                &&x.StorageId==1).ToListAsync();
                 if (limit > result.Count() && offset >= 0)
                 {
                     return Ok(new ResponseData<Category>
@@ -133,7 +137,8 @@ namespace CapstoneProject_BE.Controllers.Product
         {
             try
             {
-                var result = await _context.Categories.SingleOrDefaultAsync(x => x.CategoryId == catId);
+                //var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
+                var result = await _context.Categories.SingleOrDefaultAsync(x => x.CategoryId == catId && x.StorageId == 1);
                 if (result != null)
                 {
                     return Ok(result);

@@ -4,6 +4,7 @@ using CapstoneProject_BE.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CapstoneProject_BE.Migrations
 {
     [DbContext(typeof(InventoryManagementContext))]
-    partial class InventoryManagementContextModelSnapshot : ModelSnapshot
+    [Migration("20230302033859_addStorage")]
+    partial class addStorage
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -514,94 +516,6 @@ namespace CapstoneProject_BE.Migrations
                     b.ToTable("Role", (string)null);
                 });
 
-            modelBuilder.Entity("CapstoneProject_BE.Models.StocktakeNote", b =>
-                {
-                    b.Property<int>("StocktakeId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("StocktakeId"), 1L, 1);
-
-                    b.Property<DateTime?>("Canceled")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("CreatedId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Note")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("State")
-                        .HasColumnType("int");
-
-                    b.Property<string>("StocktakeCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("StorageId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("Updated")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("UpdatedId")
-                        .HasColumnType("int");
-
-                    b.HasKey("StocktakeId");
-
-                    b.HasIndex("CreatedId");
-
-                    b.HasIndex("StorageId");
-
-                    b.HasIndex("UpdatedId");
-
-                    b.ToTable("StocktakeNote", (string)null);
-                });
-
-            modelBuilder.Entity("CapstoneProject_BE.Models.StocktakeNoteDetail", b =>
-                {
-                    b.Property<int>("DetailId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DetailId"), 1L, 1);
-
-                    b.Property<int>("ActualStock")
-                        .HasColumnType("int");
-
-                    b.Property<int>("AmountDifferential")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CurrentStock")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("MeasuredUnitId")
-                        .IsRequired()
-                        .HasColumnType("int");
-
-                    b.Property<string>("Note")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("StocktakeId")
-                        .HasColumnType("int");
-
-                    b.HasKey("DetailId");
-
-                    b.HasIndex("MeasuredUnitId");
-
-                    b.HasIndex("ProductId");
-
-                    b.HasIndex("StocktakeId");
-
-                    b.ToTable("StocktakeNoteDetail", (string)null);
-                });
-
             modelBuilder.Entity("CapstoneProject_BE.Models.Storage", b =>
                 {
                     b.Property<int>("StorageId")
@@ -702,9 +616,6 @@ namespace CapstoneProject_BE.Migrations
 
                     b.Property<int>("StorageId")
                         .HasColumnType("int");
-
-                    b.Property<string>("UserCode")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserName")
                         .HasColumnType("nvarchar(max)");
@@ -916,60 +827,6 @@ namespace CapstoneProject_BE.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("CapstoneProject_BE.Models.StocktakeNote", b =>
-                {
-                    b.HasOne("CapstoneProject_BE.Models.User", "CreatedBy")
-                        .WithMany("CreatedStocktakeNotes")
-                        .HasForeignKey("CreatedId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("CapstoneProject_BE.Models.Storage", "Storage")
-                        .WithMany("StocktakeNotes")
-                        .HasForeignKey("StorageId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("CapstoneProject_BE.Models.User", "UpdatedBy")
-                        .WithMany("UpdatedStocktakeNotes")
-                        .HasForeignKey("UpdatedId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("CreatedBy");
-
-                    b.Navigation("Storage");
-
-                    b.Navigation("UpdatedBy");
-                });
-
-            modelBuilder.Entity("CapstoneProject_BE.Models.StocktakeNoteDetail", b =>
-                {
-                    b.HasOne("CapstoneProject_BE.Models.MeasuredUnit", "MeasuredUnit")
-                        .WithMany("StocktakeNoteDetails")
-                        .HasForeignKey("MeasuredUnitId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("CapstoneProject_BE.Models.Product", "Product")
-                        .WithMany()
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("CapstoneProject_BE.Models.StocktakeNote", "StocktakeNote")
-                        .WithMany("StocktakeNoteDetails")
-                        .HasForeignKey("StocktakeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("MeasuredUnit");
-
-                    b.Navigation("Product");
-
-                    b.Navigation("StocktakeNote");
-                });
-
             modelBuilder.Entity("CapstoneProject_BE.Models.Supplier", b =>
                 {
                     b.HasOne("CapstoneProject_BE.Models.Storage", "Storage")
@@ -1025,8 +882,6 @@ namespace CapstoneProject_BE.Migrations
                     b.Navigation("ExportOrderDetails");
 
                     b.Navigation("ImportOrderDetails");
-
-                    b.Navigation("StocktakeNoteDetails");
                 });
 
             modelBuilder.Entity("CapstoneProject_BE.Models.Product", b =>
@@ -1045,11 +900,6 @@ namespace CapstoneProject_BE.Migrations
                     b.Navigation("Users");
                 });
 
-            modelBuilder.Entity("CapstoneProject_BE.Models.StocktakeNote", b =>
-                {
-                    b.Navigation("StocktakeNoteDetails");
-                });
-
             modelBuilder.Entity("CapstoneProject_BE.Models.Storage", b =>
                 {
                     b.Navigation("Categories");
@@ -1059,8 +909,6 @@ namespace CapstoneProject_BE.Migrations
                     b.Navigation("ImportOrders");
 
                     b.Navigation("Products");
-
-                    b.Navigation("StocktakeNotes");
 
                     b.Navigation("Suppliers");
 
@@ -1076,8 +924,6 @@ namespace CapstoneProject_BE.Migrations
 
             modelBuilder.Entity("CapstoneProject_BE.Models.User", b =>
                 {
-                    b.Navigation("CreatedStocktakeNotes");
-
                     b.Navigation("EmailTokens");
 
                     b.Navigation("ExportOrder");
@@ -1088,8 +934,6 @@ namespace CapstoneProject_BE.Migrations
 
                     b.Navigation("RefreshToken")
                         .IsRequired();
-
-                    b.Navigation("UpdatedStocktakeNotes");
                 });
 #pragma warning restore 612, 618
         }

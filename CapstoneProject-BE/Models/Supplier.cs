@@ -22,5 +22,7 @@ namespace CapstoneProject_BE.Models
         public virtual ICollection<Product>? Products { get; set; }
         [JsonIgnore]
         public virtual ICollection<ImportOrder> ImportOrders { get; set; }
+        public int StorageId { get; set; }
+        public Storage Storage { get; set; }
     }
 }
