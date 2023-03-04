@@ -11,6 +11,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CapstoneProject_BE.Controllers.Stock
 {
+    [Route("api/[controller]")]
+    [ApiController]
     public class StocktakeController:ControllerBase
     {
         public IConfiguration _configuration;
