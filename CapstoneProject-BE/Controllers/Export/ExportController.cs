@@ -31,10 +31,12 @@ namespace CapstoneProject_BE.Controllers.Export
 
                 if (p != null)
                 {
-                    var dbimport = _context.ExportOrders.Include(a => a.ExportOrderDetails).SingleOrDefault(a => a.ExportId == p.ExportId);
+                    //var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
+                    var dbimport = _context.ExportOrders.Include(a => a.ExportOrderDetails).SingleOrDefault(a => a.ExportId == p.ExportId && a.StorageId == 1);
                     var result = mapper.Map<ExportOrder>(p);
                     if (dbimport.State == 0)
                     {
+                        result.StorageId = 1;
                         _context.RemoveRange(dbimport.ExportOrderDetails);
                         await _context.SaveChangesAsync();
                         _context.ChangeTracker.Clear();
@@ -64,10 +66,12 @@ namespace CapstoneProject_BE.Controllers.Export
             {
                 if (p != null)
                 {
+                    //var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
                     var result = mapper.Map<ExportOrder>(p);
                     result.Created = DateTime.Now;
                     result.State = 0;
                     result.ExportCode ="XAHA"+TokenHelper.GenerateNumericToken(16);
+                    result.StorageId = 1;
                     _context.Add(result);
                     await _context.SaveChangesAsync();
                     return Ok("Thành công");
@@ -110,6 +114,7 @@ namespace CapstoneProject_BE.Controllers.Export
         {
             try
             {
+                //var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
                 var result = await _context.ExportOrders
                     .Where(x => (x.ExportCode.Contains(code) || code == "")
                  && (x.State == state || state == -1)
@@ -149,6 +154,7 @@ namespace CapstoneProject_BE.Controllers.Export
         {
             try
             {
+                //var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
                 var result = await _context.ExportOrders
                     .Include(x => x.ExportOrderDetails).ThenInclude(x => x.Product).ThenInclude(x=>x.MeasuredUnits).Include(x => x.User)
                     .SingleOrDefaultAsync(x => x.ExportId == exportId);
@@ -171,6 +177,7 @@ namespace CapstoneProject_BE.Controllers.Export
         {
             try
             {
+                //var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
                 var result = await _context.ExportOrders.SingleOrDefaultAsync(x => x.ExportId == exportId);
                 if (result != null && result.State == 0)
                 {
@@ -194,6 +201,7 @@ namespace CapstoneProject_BE.Controllers.Export
         {
             try
             {
+                //var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
                 var result = await _context.ExportOrders.Include(a => a.ExportOrderDetails).SingleOrDefaultAsync(x => x.ExportId == exportId);
                 if (result != null && result.State == 1)
                 {

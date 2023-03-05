@@ -232,6 +232,8 @@ namespace CapstoneProject_BE.Controllers.Authentication
                         RoleId = 1,
                         UserName = TokenHelper.GenerateRandomToken(8)
                     };
+                    _context.Add(newuser);
+                    await _context.SaveChangesAsync();
                     var emailtoken = new EmailToken
                     {
                         Token = token,
