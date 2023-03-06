@@ -37,7 +37,8 @@ namespace CapstoneProject_BE.Controllers.Stock
                     var result = mapper.Map<StocktakeNote>(p);
                     result.Created = DateTime.Now;
                     result.State = 0;
-                    result.StocktakeCode = "KIHA" + (_context.StocktakeNotes.Where(x=>x.StorageId==1).Count()+1);
+                    var code = (_context.StocktakeNotes.Where(x => x.StorageId == 1).Count() + 1);
+                    result.StocktakeCode = "KIHA" +code ;
                     result.StorageId = 1;
                     result.CreatedId = 1;
                     _context.Add(result);

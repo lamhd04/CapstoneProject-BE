@@ -17,7 +17,12 @@ namespace CapstoneProject_BE.DTO
         public float InDebted { get; set; }
         public string? Note { get; set; }
         public int State { get; set; }
-        public List<ImportDetailDTO> ImportOrderDetails { get; set; } 
-        
+        public List<ImportDetailDTO> ImportOrderDetails { get; set; }
+        public DateTime Created { get; set; }
+        public DateTime? Approved { get; set; }
+        public DateTime? Completed { get; set; }
+        public DateTime? Denied { get; set; }
+        public virtual User User { get; set; }
+        public virtual Supplier Supplier { get; set; }
     }
 }

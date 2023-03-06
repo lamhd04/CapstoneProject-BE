@@ -42,6 +42,12 @@ namespace CapstoneProject_BE.AutoMapper
                 map => map.MapFrom(
                     c => c.MeasuredUnitId==0? null:c.MeasuredUnitId
                     ));
+            CreateMap<ImportOrder, ImportOrderDTO>();
+            CreateMap<ImportOrderDetail, ImportDetailDTO>()
+                                .ForMember(cdto => cdto.DefaultMeasuredUnit,
+                map => map.MapFrom(
+                    c => c.Product.DefaultMeasuredUnit
+                    ));
             CreateMap<ExportOrderDTO, ExportOrder>();
             CreateMap<ExportDetailDTO, ExportOrderDetail>()
                                 .ForMember(cdto => cdto.MeasuredUnitId,

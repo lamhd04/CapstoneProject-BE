@@ -42,6 +42,7 @@ namespace CapstoneProject_BE.Controllers.Import
                         _context.RemoveRange(dbimport.ImportOrderDetails);
                         await _context.SaveChangesAsync();
                         _context.ChangeTracker.Clear();
+                        result.StorageId = 1;
                         _context.Update(result);
                         await _context.SaveChangesAsync();
                         return Ok("Thành công");
@@ -85,7 +86,8 @@ namespace CapstoneProject_BE.Controllers.Import
                     var result = mapper.Map<Models.ImportOrder>(p);
                     result.Created = DateTime.Now;
                     result.State = 0;
-                    result.ImportCode = "NAHA" + _context.ImportOrders.Where(x=>x.StorageId==1).Count()+1;
+                    var code = _context.ImportOrders.Where(x => x.StorageId == 1).Count() + 1;
+                    result.ImportCode = "NAHA" + code;
                     result.StorageId = 1;
                     _context.Add(result);
                     await _context.SaveChangesAsync();
@@ -174,8 +176,8 @@ namespace CapstoneProject_BE.Controllers.Import
                     .SingleOrDefaultAsync(x => x.ImportId == importid&&x.StorageId==1);
                 
                 if (result != null)
-                {
-                    return Ok(result);
+                { 
+                    return Ok(mapper.Map<ImportOrderDTO>(result));
                 }
                 else
                 {

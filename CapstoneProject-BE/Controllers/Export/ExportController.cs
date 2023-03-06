@@ -70,7 +70,8 @@ namespace CapstoneProject_BE.Controllers.Export
                     var result = mapper.Map<ExportOrder>(p);
                     result.Created = DateTime.Now;
                     result.State = 0;
-                    result.ExportCode ="XAHA"+TokenHelper.GenerateNumericToken(16);
+                    var code = _context.ImportOrders.Where(x => x.StorageId == 1).Count() + 1;
+                    result.ExportCode ="XAHA"+code;
                     result.StorageId = 1;
                     _context.Add(result);
                     await _context.SaveChangesAsync();
