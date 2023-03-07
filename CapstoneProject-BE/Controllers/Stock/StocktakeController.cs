@@ -128,7 +128,8 @@ namespace CapstoneProject_BE.Controllers.Stock
                         else
                         {
                             return BadRequest("Số lượng không đổi");
-                        }                      
+                        }
+                        history.ActionCode = result.StocktakeCode;
                         history.UserId = (int)result.UpdatedId;
                         history.Amount = product.InStock;
                         history.Date = DateTime.Now;
@@ -183,7 +184,7 @@ namespace CapstoneProject_BE.Controllers.Stock
                 {
                     return Ok(new ResponseData<StocktakeNote>
                     {
-                        Data = result.Skip(offset).Take(result.Count()).ToList(),
+                        Data = result.Skip(offset).Take(result.Count()).OrderByDescending(x => x.Created).ToList(),
                         Offset = offset,
                         Limit = limit,
                         Total = result.Count()
@@ -193,7 +194,7 @@ namespace CapstoneProject_BE.Controllers.Stock
                 {
                     return Ok(new ResponseData<StocktakeNote>
                     {
-                        Data = result.Skip(offset).Take(limit).ToList(),
+                        Data = result.Skip(offset).Take(limit).OrderByDescending(x => x.Created).ToList(),
                         Offset = offset,
                         Limit = limit,
                         Total = result.Count()
@@ -218,6 +219,30 @@ namespace CapstoneProject_BE.Controllers.Stock
                 var result = await _context.StocktakeNotes
                     .Include(x => x.StocktakeNoteDetails).ThenInclude(x => x.Product).ThenInclude(x => x.MeasuredUnits).Include(x => x.UpdatedBy).Include(x => x.CreatedBy)
                     .SingleOrDefaultAsync(x => x.StocktakeId == stocktakeid && x.StorageId == 1);
+
+                if (result != null)
+                {
+                    return Ok(result);
+                }
+                else
+                {
+                    return BadRequest("Không có dữ liệu");
+                }
+            }
+            catch
+            {
+                return StatusCode(500);
+            }
+        }
+        [HttpGet("GetDetail")]
+        public async Task<IActionResult> GetDetail(string stocktakecode)
+        {
+            try
+            {
+                //var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
+                var result = await _context.StocktakeNotes
+                    .Include(x => x.StocktakeNoteDetails).ThenInclude(x => x.Product).ThenInclude(x => x.MeasuredUnits).Include(x => x.UpdatedBy).Include(x => x.CreatedBy)
+                    .SingleOrDefaultAsync(x => x.StocktakeCode == stocktakecode && x.StorageId == 1);
 
                 if (result != null)
                 {

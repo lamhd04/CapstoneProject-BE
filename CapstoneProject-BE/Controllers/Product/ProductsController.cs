@@ -78,10 +78,12 @@ namespace CapstoneProject_BE.Controllers.Product
             {
                 //var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
                 var result = await _context.Products.Include(x => x.Supplier)
-                    .Include(x => x.MeasuredUnits).Include(x => x.Category).Include(x=>x.ProductHistories).ThenInclude(x=>x.ActionType)
+                    .Include(x => x.MeasuredUnits).Include(x => x.Category)
                     .SingleOrDefaultAsync(x => x.ProductId == prodId&&(x.Barcode==barcode||barcode=="")&&x.StorageId==1);
+                var history = await _context.ProductHistories.Where(x => x.ProductId == result.ProductId).Include(x => x.User).Include(x => x.ActionType).ToListAsync();
                 if (result != null)
                 {
+                    result.ProductHistories = history;
                     return Ok(result);
 
                 }

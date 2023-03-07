@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using CapstoneProject_BE.AutoMapper;
 using CapstoneProject_BE.DTO;
 using CapstoneProject_BE.Models;
 using Microsoft.AspNetCore.Http;
@@ -11,12 +12,15 @@ namespace CapstoneProject_BE.Controllers.Product
     [ApiController]
     public class CategoriesController : ControllerBase
     {
+        public IMapper mapper;
         public IConfiguration _configuration;
         private readonly InventoryManagementContext _context;
         public CategoriesController(InventoryManagementContext context, IConfiguration configuration)
         {
             _context = context;
             _configuration = configuration;
+            var config = new MapperConfiguration(cfg => cfg.AddProfile(new MappingProfile()));
+            this.mapper = config.CreateMapper();
         }
         [HttpDelete("Delete")]
         public async Task<IActionResult> Delete(int catId)
@@ -43,15 +47,16 @@ namespace CapstoneProject_BE.Controllers.Product
             }
         }
         [HttpPost("PostCategory")]
-        public async Task<IActionResult> PostCategory(Category c)
+        public async Task<IActionResult> PostCategory(CategoryDTO c)
         {
             try
             {
                 //var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
                 if (c != null)
                 {
-                    c.StorageId = 1;
-                    _context.Add(c);
+                    var result = mapper.Map<Category>(c);
+                    result.StorageId = 1;
+                    _context.Add(result);
                     await _context.SaveChangesAsync();
                     return Ok("Thành công");
 
@@ -67,7 +72,7 @@ namespace CapstoneProject_BE.Controllers.Product
             }
         }
         [HttpPut("PutCategory")]
-        public async Task<IActionResult> PutCategory(Category c)
+        public async Task<IActionResult> PutCategory(CategoryDTO c)
         {
             try
             {

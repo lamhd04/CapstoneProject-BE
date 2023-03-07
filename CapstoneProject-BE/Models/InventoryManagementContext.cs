@@ -24,6 +24,7 @@ namespace CapstoneProject_BE.Models
         public DbSet<StocktakeNoteDetail> StocktakeNoteDetails { get; set; }
         public DbSet<ActionType> ActionTypes { get; set; }
         public DbSet<Storage> Storages { get; set; }
+        public DbSet<ProductHistory> ProductHistories { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>(e =>
@@ -209,8 +210,6 @@ namespace CapstoneProject_BE.Models
                 e.HasOne(r => r.Product)
                 .WithMany(r => r.ProductHistories)
                 .HasForeignKey(r => r.ProductId);
-                e.Property(u => u.ProductId).IsRequired();
-                e.Property(u => u.Price).IsRequired();
                 e.Property(u => u.HistoryId).UseIdentityColumn();
             });
             modelBuilder.Entity<ActionType>(e =>

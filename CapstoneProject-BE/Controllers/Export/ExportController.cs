@@ -37,6 +37,7 @@ namespace CapstoneProject_BE.Controllers.Export
                     if (dbimport.State == 0)
                     {
                         result.StorageId = 1;
+                        result.Created = dbimport.Created;
                         _context.RemoveRange(dbimport.ExportOrderDetails);
                         await _context.SaveChangesAsync();
                         _context.ChangeTracker.Clear();
@@ -124,7 +125,7 @@ namespace CapstoneProject_BE.Controllers.Export
                 {
                     return Ok(new ResponseData<ExportOrder>
                     {
-                        Data = result.Skip(offset).Take(result.Count()).ToList(),
+                        Data = result.Skip(offset).Take(result.Count()).OrderByDescending(x => x.Created).ToList(),
                         Offset = offset,
                         Limit = limit,
                         Total = result.Count()
@@ -134,7 +135,7 @@ namespace CapstoneProject_BE.Controllers.Export
                 {
                     return Ok(new ResponseData<ExportOrder>
                     {
-                        Data = result.Skip(offset).Take(limit).ToList(),
+                        Data = result.Skip(offset).Take(limit).OrderByDescending(x => x.Created).ToList(),
                         Offset = offset,
                         Limit = limit,
                         Total = result.Count()
@@ -159,6 +160,29 @@ namespace CapstoneProject_BE.Controllers.Export
                 var result = await _context.ExportOrders
                     .Include(x => x.ExportOrderDetails).ThenInclude(x => x.Product).ThenInclude(x=>x.MeasuredUnits).Include(x => x.User)
                     .SingleOrDefaultAsync(x => x.ExportId == exportId);
+                if (result != null)
+                {
+                    return Ok(result);
+                }
+                else
+                {
+                    return BadRequest("Không có dữ liệu");
+                }
+            }
+            catch
+            {
+                return StatusCode(500);
+            }
+        }
+        [HttpGet("GetExportDetail")]
+        public async Task<IActionResult> GetExportDetail(string exportcode)
+        {
+            try
+            {
+                //var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
+                var result = await _context.ExportOrders
+                    .Include(x => x.ExportOrderDetails).ThenInclude(x => x.Product).ThenInclude(x => x.MeasuredUnits).Include(x => x.User)
+                    .SingleOrDefaultAsync(x => x.ExportCode == exportcode&&x.StorageId==1);
                 if (result != null)
                 {
                     return Ok(result);
@@ -243,6 +267,7 @@ namespace CapstoneProject_BE.Controllers.Export
                             history.PriceDifferential = $"-{pricedifferential}";
                         else
                             history.PriceDifferential = null;
+                        history.ActionCode = result.ExportCode;
                         history.UserId = result.UserId;
                         history.Amount = product.InStock;
                         history.Date = DateTime.Now;

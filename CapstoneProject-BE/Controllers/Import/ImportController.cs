@@ -43,6 +43,7 @@ namespace CapstoneProject_BE.Controllers.Import
                         await _context.SaveChangesAsync();
                         _context.ChangeTracker.Clear();
                         result.StorageId = 1;
+                        result.Created = dbimport.Created;
                         _context.Update(result);
                         await _context.SaveChangesAsync();
                         return Ok("Thành công");
@@ -139,7 +140,7 @@ namespace CapstoneProject_BE.Controllers.Import
                 {
                     return Ok(new ResponseData<ImportOrder>
                     {
-                        Data = result.Skip(offset).Take(result.Count()).ToList(),
+                        Data = result.Skip(offset).Take(result.Count()).OrderByDescending(x=>x.Created).ToList(),
                         Offset = offset,
                         Limit = limit,
                         Total = result.Count()
@@ -149,7 +150,7 @@ namespace CapstoneProject_BE.Controllers.Import
                 {
                     return Ok(new ResponseData<ImportOrder>
                     {
-                        Data = result.Skip(offset).Take(limit).ToList(),
+                        Data = result.Skip(offset).Take(limit).OrderByDescending(x => x.Created).ToList(),
                         Offset = offset,
                         Limit = limit,
                         Total = result.Count()
@@ -177,6 +178,30 @@ namespace CapstoneProject_BE.Controllers.Import
                 
                 if (result != null)
                 { 
+                    return Ok(mapper.Map<ImportOrderDTO>(result));
+                }
+                else
+                {
+                    return BadRequest("Không có dữ liệu");
+                }
+            }
+            catch
+            {
+                return StatusCode(500);
+            }
+        }
+        [HttpGet("GetImportDetail")]
+        public async Task<IActionResult> GetImportDetail(string importcode)
+        {
+            try
+            {
+                //var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
+                var result = await _context.ImportOrders
+                    .Include(x => x.ImportOrderDetails).ThenInclude(x => x.Product).ThenInclude(x => x.MeasuredUnits).Include(x => x.Supplier).Include(x => x.User)
+                    .SingleOrDefaultAsync(x => x.ImportCode == importcode && x.StorageId == 1);
+
+                if (result != null)
+                {
                     return Ok(mapper.Map<ImportOrderDTO>(result));
                 }
                 else
@@ -254,6 +279,7 @@ namespace CapstoneProject_BE.Controllers.Import
                             history.CostPriceDifferential = $"-{costdifferential}";
                         else
                             history.CostPriceDifferential = null;
+                        history.ActionCode = result.ImportCode;
                         history.UserId = result.UserId;
                         history.Amount = product.InStock;
                         history.Date = DateTime.Now;
