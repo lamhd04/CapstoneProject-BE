@@ -71,7 +71,7 @@ namespace CapstoneProject_BE.Controllers.Export
                     var result = mapper.Map<ExportOrder>(p);
                     result.Created = DateTime.Now;
                     result.State = 0;
-                    var code = _context.ImportOrders.Where(x => x.StorageId == 1).Count() + 1;
+                    var code = _context.ExportOrders.Where(x => x.StorageId == 1).Count() + 1;
                     result.ExportCode ="XAHA"+code;
                     result.StorageId = 1;
                     _context.Add(result);
@@ -120,12 +120,12 @@ namespace CapstoneProject_BE.Controllers.Export
                 var result = await _context.ExportOrders
                     .Where(x => (x.ExportCode.Contains(code) || code == "")
                  && (x.State == state || state == -1)
-                 ).ToListAsync();
+                 ).OrderByDescending(x => x.Created).ToListAsync();
                 if (limit > result.Count() && offset >= 0)
                 {
                     return Ok(new ResponseData<ExportOrder>
                     {
-                        Data = result.Skip(offset).Take(result.Count()).OrderByDescending(x => x.Created).ToList(),
+                        Data = result.Skip(offset).Take(result.Count()).ToList(),
                         Offset = offset,
                         Limit = limit,
                         Total = result.Count()
@@ -135,7 +135,7 @@ namespace CapstoneProject_BE.Controllers.Export
                 {
                     return Ok(new ResponseData<ExportOrder>
                     {
-                        Data = result.Skip(offset).Take(limit).OrderByDescending(x => x.Created).ToList(),
+                        Data = result.Skip(offset).Take(limit).ToList(),
                         Offset = offset,
                         Limit = limit,
                         Total = result.Count()
@@ -162,7 +162,7 @@ namespace CapstoneProject_BE.Controllers.Export
                     .SingleOrDefaultAsync(x => x.ExportId == exportId);
                 if (result != null)
                 {
-                    return Ok(result);
+                    return Ok(mapper.Map<ExportOrderDTO>(result));
                 }
                 else
                 {
@@ -174,7 +174,7 @@ namespace CapstoneProject_BE.Controllers.Export
                 return StatusCode(500);
             }
         }
-        [HttpGet("GetExportDetail")]
+        [HttpGet("GetDetail")]
         public async Task<IActionResult> GetExportDetail(string exportcode)
         {
             try

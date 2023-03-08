@@ -135,12 +135,12 @@ namespace CapstoneProject_BE.Controllers.Import
                 var result = await _context.ImportOrders.Include(a=>a.Supplier)
                     .Where(x => (x.Supplier.SupplierName.Contains(code)||x.ImportCode.Contains(code)||code=="")
                 && (x.SupplierId == supId || supId == 0) && (x.State == state || state == -1)
-                 ).ToListAsync();
+                 ).OrderByDescending(x => x.Created).ToListAsync();
                 if (limit > result.Count() && offset >= 0)
                 {
                     return Ok(new ResponseData<ImportOrder>
                     {
-                        Data = result.Skip(offset).Take(result.Count()).OrderByDescending(x=>x.Created).ToList(),
+                        Data = result.Skip(offset).Take(result.Count()).ToList(),
                         Offset = offset,
                         Limit = limit,
                         Total = result.Count()
@@ -150,7 +150,7 @@ namespace CapstoneProject_BE.Controllers.Import
                 {
                     return Ok(new ResponseData<ImportOrder>
                     {
-                        Data = result.Skip(offset).Take(limit).OrderByDescending(x => x.Created).ToList(),
+                        Data = result.Skip(offset).Take(limit).ToList(),
                         Offset = offset,
                         Limit = limit,
                         Total = result.Count()
@@ -190,7 +190,7 @@ namespace CapstoneProject_BE.Controllers.Import
                 return StatusCode(500);
             }
         }
-        [HttpGet("GetImportDetail")]
+        [HttpGet("GetDetail")]
         public async Task<IActionResult> GetImportDetail(string importcode)
         {
             try

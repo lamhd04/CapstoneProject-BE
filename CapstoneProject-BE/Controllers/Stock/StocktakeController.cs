@@ -67,6 +67,7 @@ namespace CapstoneProject_BE.Controllers.Stock
                     var result = mapper.Map<StocktakeNote>(p);
                     if (dbimport.State == 0)
                     {
+                        result.Created = dbimport.Created;
                         _context.RemoveRange(dbimport.StocktakeNoteDetails);
                         await _context.SaveChangesAsync();
                         _context.ChangeTracker.Clear();
@@ -121,8 +122,8 @@ namespace CapstoneProject_BE.Controllers.Stock
                         }
                         if (product.InStock != total)
                         {
-
-                            history.AmountDifferential = product.InStock > total ? $"-{total}" : $"+{total}";
+                            var change = product.InStock - total;
+                            history.AmountDifferential = change<0 ? $"-{change}" : $"+{change}";
                                 product.InStock = total;
                         }
                         else
@@ -179,12 +180,12 @@ namespace CapstoneProject_BE.Controllers.Stock
                 var result = await _context.StocktakeNotes.Include(a => a.CreatedBy).Include(a=>a.UpdatedBy)
                     .Where(x => x.StocktakeCode.Contains(code)
                 && (x.Created == created || created == null)&&(x.Updated==updated||updated==null) && (x.State == state || state == -1)
-                 ).ToListAsync();
+                 ).OrderByDescending(x => x.Created).ToListAsync();
                 if (limit > result.Count() && offset >= 0)
                 {
                     return Ok(new ResponseData<StocktakeNote>
                     {
-                        Data = result.Skip(offset).Take(result.Count()).OrderByDescending(x => x.Created).ToList(),
+                        Data = result.Skip(offset).Take(result.Count()).ToList(),
                         Offset = offset,
                         Limit = limit,
                         Total = result.Count()
@@ -194,7 +195,7 @@ namespace CapstoneProject_BE.Controllers.Stock
                 {
                     return Ok(new ResponseData<StocktakeNote>
                     {
-                        Data = result.Skip(offset).Take(limit).OrderByDescending(x => x.Created).ToList(),
+                        Data = result.Skip(offset).Take(limit).ToList(),
                         Offset = offset,
                         Limit = limit,
                         Total = result.Count()
@@ -210,7 +211,7 @@ namespace CapstoneProject_BE.Controllers.Stock
                 return StatusCode(500);
             }
         }
-        [HttpGet("GetDetail")]
+        [HttpGet("GetStocktakeDetail")]
         public async Task<IActionResult> GetDetail(int stocktakeid)
         {
             try

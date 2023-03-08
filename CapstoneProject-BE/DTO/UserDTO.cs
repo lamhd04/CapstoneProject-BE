@@ -9,6 +9,7 @@ namespace CapstoneProject_BE.DTO
         public string? UserName { get; set; }
         public string? Address { get; set; }
         public string? Identity { get; set; }
+        [DataType(DataType.EmailAddress)]
         public string? Email { get; set; }
         public string Password { get; set; }
         [DataType(DataType.PhoneNumber)]

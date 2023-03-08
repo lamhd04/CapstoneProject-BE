@@ -13,6 +13,11 @@ namespace CapstoneProject_BE.DTO
         public string? Note { get; set; }
         public int State { get; set; }
         public List<ExportDetailDTO> ExportOrderDetails { get; set; }
+        public DateTime CreatedDate { get; set; }
+        public DateTime? ApprovedDate { get; set; }
+        public DateTime? CompletedDate { get; set; }
+        public DateTime? DeniedDate { get; set; }
+        public User? User { get; set; }
 
     }
 }
