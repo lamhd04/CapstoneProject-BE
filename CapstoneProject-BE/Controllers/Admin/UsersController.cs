@@ -6,6 +6,7 @@ using CapstoneProject_BE.Models;
 using DocumentFormat.OpenXml.Drawing;
 using DocumentFormat.OpenXml.EMMA;
 using DocumentFormat.OpenXml.Math;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -26,6 +27,7 @@ namespace CapstoneProject_BE.Controllers.Admin
             var config = new MapperConfiguration(cfg => cfg.AddProfile(new MappingProfile()));
             mapper = config.CreateMapper();
         }
+        [Authorize(Policy = "Owner")]
         [HttpPost("Deactivate")]
         public async Task<IActionResult> Deactivate(int userid)
         {
@@ -49,6 +51,7 @@ namespace CapstoneProject_BE.Controllers.Admin
                 return StatusCode(500);
             }
         }
+        [Authorize(Policy = "Owner")]
         [HttpPost("Activate")]
         public async Task<IActionResult> Activate(int userid)
         {
@@ -72,6 +75,7 @@ namespace CapstoneProject_BE.Controllers.Admin
                 return StatusCode(500);
             }
         }
+        [Authorize]
         [HttpGet("GetUserDetail")]
         public async Task<IActionResult> GetDetail(int userid)
         {
@@ -93,15 +97,16 @@ namespace CapstoneProject_BE.Controllers.Admin
                 return StatusCode(500);
             }
         }
+        [Authorize]
         [HttpGet("GetUsers")]
-        public async Task<IActionResult> GetUsers(int offset, int limit, int? roleid = 0, bool? status = false, string? search = "")
+        public async Task<IActionResult> GetUsers(int offset, int limit, int? roleid = 0, bool? status = null, string? search = "")
         {
             try
             {
                 //var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
                 var result = await _context.Users
                     .Where(x => (x.UserCode.Contains(search)||x.UserName.Contains(search)||x.Phone.Contains(search) || search == "")
-                    && (x.Status == status || status == false)&&(x.RoleId==roleid||roleid==0)
+                    && (x.Status == status || status == null)&&(x.RoleId==roleid||roleid==0)
                  ).OrderBy(x => x.UserName).ToListAsync();
                 if (limit > result.Count() && offset >= 0)
                 {
@@ -134,15 +139,22 @@ namespace CapstoneProject_BE.Controllers.Admin
             }
 
         }
+        [Authorize(Policy = "Owner")]
         [HttpPost("CreateStaff")]
         public async Task<IActionResult> CreateStaff(UserDTO u)
         {
             try
             {
                 //var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
+                var db = await _context.Users.SingleOrDefaultAsync(x => x.UserCode == u.UserCode&&x.StorageId==1);
+                if (db != null)
+                {
+                    return BadRequest("Mã Nhân Viên Đã Tồn Tại");
+                }
                 var user = mapper.Map<User>(u);
                 user.StorageId = 1;
-                user.Password = "123456789aA@";
+                user.Email = null;
+                user.Password =HashHelper.Encrypt("123456789aA@",_configuration);
                 _context.Add(user);
                 await _context.SaveChangesAsync();
                 return Ok();
@@ -153,17 +165,28 @@ namespace CapstoneProject_BE.Controllers.Admin
             }
 
         }
+        [Authorize]
         [HttpPut("UpdateStaff")]
         public async Task<IActionResult> UpdateStaff(UserDTO u)
         {
             try
             {
                 //var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
-                var user = mapper.Map<User>(u);
-                user.StorageId = 1;
-                _context.Update(user);
-                await _context.SaveChangesAsync();
-                return Ok();
+                var db = await _context.Users.SingleOrDefaultAsync(x => x.UserCode == u.UserCode&&x.StorageId==1);
+                if (db != null)
+                {
+                    var user = mapper.Map<User>(u);
+                    user.StorageId = 1;
+                    user.Email = null;
+                    _context.Update(user);
+                    await _context.SaveChangesAsync();
+                    return Ok();
+                }
+                else
+                {
+                    return BadRequest("Không thể thay đổi mã NV");
+                }
+
             }
             catch
             {

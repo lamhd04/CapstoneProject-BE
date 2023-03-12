@@ -14,6 +14,8 @@ namespace CapstoneProject_BE.Models
         public string? Phone { get; set; }
         public int RoleId { get; set; }
         public bool Status { get; set; }
+        public bool Gender { get; set; }
+        public DateTime BirthDate { get; set; }
         [JsonIgnore]
         public virtual ICollection<ImportOrder> ImportOrder { get; set; }
         [JsonIgnore]

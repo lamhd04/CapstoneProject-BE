@@ -16,5 +16,7 @@ namespace CapstoneProject_BE.DTO
         public string? Phone { get; set; }
         public int RoleId { get; set; }
         public bool Status { get; set; }
+        public bool Gender { get; set; }
+        public DateTime BirthDate { get; set; }
     }
 }

@@ -38,7 +38,15 @@ namespace CapstoneProject_BE.Controllers.Authentication
         {
             try
             {
-                var user = await _context.Users.SingleOrDefaultAsync(u => u.Email == model.Email);
+                User user = new User();
+                if (model.Email == null)
+                {
+                    user = await _context.Users.SingleOrDefaultAsync(u => u.UserCode == model.Usercode&&u.StorageId==1);
+                }
+                else
+                {
+                    user=await _context.Users.SingleOrDefaultAsync(u => u.Email == model.Email&&u.StorageId==1);
+                }                   
                 if (user!=null&&HashHelper.Decrypt(user.Password,_configuration)==model.Password&&user.Status)
                 {
                     return Ok(GenerateToken(user));

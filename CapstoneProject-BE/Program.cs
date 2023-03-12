@@ -36,10 +36,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("Admin", policy =>
+    options.AddPolicy("Owner", policy =>
                       policy.RequireClaim("Role", "1"));
-    options.AddPolicy("User", policy =>
+    options.AddPolicy("Storekeeper", policy =>
                       policy.RequireClaim("Role", "2"));
+    options.AddPolicy("Seller", policy =>
+                  policy.RequireClaim("Role", "2"));
 });
 //swagger
 builder.Services.AddSwaggerGen(option =>
