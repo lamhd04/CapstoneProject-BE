@@ -170,7 +170,7 @@ namespace CapstoneProject_BE.Controllers.Admin
             try
             {
                 //var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
-                var db = await _context.Users.SingleOrDefaultAsync(x => x.UserCode == u.UserCode&&x.StorageId==1);
+                var db = await _context.Users.SingleOrDefaultAsync(x => x.UserCode == u.UserCode);
                 if (db != null)
                 {
                     return BadRequest("Mã Nhân Viên Đã Tồn Tại");
