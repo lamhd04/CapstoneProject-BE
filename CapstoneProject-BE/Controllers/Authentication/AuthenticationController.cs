@@ -41,11 +41,11 @@ namespace CapstoneProject_BE.Controllers.Authentication
                 User user = new User();
                 if (model.Email == null)
                 {
-                    user = await _context.Users.SingleOrDefaultAsync(u => u.UserCode == model.Usercode&&u.StorageId==1);
+                    user = await _context.Users.SingleOrDefaultAsync(u => u.UserCode == model.Usercode);
                 }
                 else
                 {
-                    user=await _context.Users.SingleOrDefaultAsync(u => u.Email == model.Email&&u.StorageId==1);
+                    user=await _context.Users.SingleOrDefaultAsync(u => u.Email == model.Email);
                 }                   
                 if (user!=null&&HashHelper.Decrypt(user.Password,_configuration)==model.Password&&user.Status)
                 {
@@ -312,7 +312,7 @@ namespace CapstoneProject_BE.Controllers.Authentication
                     _configuration["Jwt:Issuer"],
                     _configuration["Jwt:Audience"],
                     claims,
-                    expires: DateTime.UtcNow.AddSeconds(2),
+                    expires: DateTime.UtcNow.AddSeconds(15),
                     signingCredentials: signIn
                 );
 

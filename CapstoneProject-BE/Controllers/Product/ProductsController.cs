@@ -72,7 +72,7 @@ namespace CapstoneProject_BE.Controllers.Product
 
         }
         [HttpGet("GetDetail")]
-        public async Task<IActionResult> GetDetail(int prodId,string? barcode="")
+        public async Task<IActionResult> GetDetail(int prodId,int offset, int limit, string? barcode="")
         {
             try
             {
@@ -80,11 +80,19 @@ namespace CapstoneProject_BE.Controllers.Product
                 var result = await _context.Products.Include(x => x.Supplier)
                     .Include(x => x.MeasuredUnits).Include(x => x.Category)
                     .SingleOrDefaultAsync(x => x.ProductId == prodId&&(x.Barcode==barcode||barcode=="")&&x.StorageId==1);
-                var history = await _context.ProductHistories.Where(x => x.ProductId == result.ProductId).Include(x => x.User).Include(x => x.ActionType).ToListAsync();
+                var history = await _context.ProductHistories.Where(x => x.ProductId == result.ProductId).Include(x => x.User).Include(x => x.ActionType).OrderByDescending(x=>x.Date).ToListAsync();
                 if (result != null)
                 {
                     result.ProductHistories = history;
                     return Ok(result);
+                    if (limit > history.Count() && offset >= 0)
+                    {
+                        history = history.Skip(offset).Take(history.Count()).ToList();
+                    }
+                    else if (offset >= 0)
+                    {
+                        history = history.Skip(offset).Take(limit).ToList();
+                    }
 
                 }
                 else

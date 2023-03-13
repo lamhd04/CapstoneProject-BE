@@ -122,7 +122,7 @@ namespace CapstoneProject_BE.Controllers.Stock
                         }
                         if (product.InStock != total)
                         {
-                            var change = product.InStock - total;
+                            var change = total-product.InStock;
                             history.AmountDifferential = change<0 ? $"-{change}" : $"+{change}";
                                 product.InStock = total;
                         }

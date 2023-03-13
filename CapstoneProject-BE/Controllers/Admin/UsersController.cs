@@ -76,6 +76,30 @@ namespace CapstoneProject_BE.Controllers.Admin
             }
         }
         [Authorize]
+        [HttpPost("ChangePassword")]
+        public async Task<IActionResult> ChangePassword(int userid,string pwd)
+        {
+            try
+            {
+                //var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
+                var result = await _context.Users.SingleOrDefaultAsync(x => x.UserId == userid);
+                if (result != null && result.Status)
+                {
+                    result.Password = HashHelper.Encrypt(pwd, _configuration);
+                    await _context.SaveChangesAsync();
+                    return Ok("Thành công");
+                }
+                else
+                {
+                    return BadRequest("Không có dữ liệu");
+                }
+            }
+            catch
+            {
+                return StatusCode(500);
+            }
+        }
+        [Authorize]
         [HttpGet("GetUserDetail")]
         public async Task<IActionResult> GetDetail(int userid)
         {
@@ -155,6 +179,7 @@ namespace CapstoneProject_BE.Controllers.Admin
                 user.StorageId = 1;
                 user.Email = null;
                 user.Password =HashHelper.Encrypt("123456789aA@",_configuration);
+                user.Status = true;
                 _context.Add(user);
                 await _context.SaveChangesAsync();
                 return Ok();
