@@ -6,6 +6,7 @@ using CapstoneProject_BE.Models;
 using DocumentFormat.OpenXml.Drawing;
 using DocumentFormat.OpenXml.EMMA;
 using DocumentFormat.OpenXml.Math;
+using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -76,13 +77,26 @@ namespace CapstoneProject_BE.Controllers.Admin
             }
         }
         [Authorize]
-        [HttpPost("ChangePassword")]
-        public async Task<IActionResult> ChangePassword(int userid,string pwd)
+        [HttpPut("ChangePassword")]
+        public async Task<IActionResult> ChangePassword(string pwd,string? oldpwd,int? userid=0)
         {
             try
             {
-                //var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
-                var result = await _context.Users.SingleOrDefaultAsync(x => x.UserId == userid);
+                var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
+                User result = null;
+                if (userid == 0)
+                {
+                    userid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "UserId").Value);
+                    result = await _context.Users.SingleOrDefaultAsync(x => x.UserId == userid);
+                    if (oldpwd != HashHelper.Decrypt(result.Password, _configuration))
+                    {
+                        return BadRequest("Mật khẩu cũ không đúng");
+                    }
+                }
+                else
+                {
+                    result = await _context.Users.SingleOrDefaultAsync(x => x.UserId == userid);
+                }
                 if (result != null && result.Status)
                 {
                     result.Password = HashHelper.Encrypt(pwd, _configuration);
@@ -101,11 +115,13 @@ namespace CapstoneProject_BE.Controllers.Admin
         }
         [Authorize]
         [HttpGet("GetUserDetail")]
-        public async Task<IActionResult> GetDetail(int userid)
+        public async Task<IActionResult> GetDetail(int? userid=0)
         {
             try
             {
                 //var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
+                if (userid == 0)
+                    userid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "UserId").Value);
                 var result = await _context.Users.SingleOrDefaultAsync(x => x.UserId == userid);
                 if (result != null)
                 {
@@ -197,21 +213,25 @@ namespace CapstoneProject_BE.Controllers.Admin
             try
             {
                 //var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
-                var db = await _context.Users.SingleOrDefaultAsync(x => x.UserCode == u.UserCode&&x.StorageId==1);
+                var userid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "UserId").Value);
+                var roleid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "RoleId").Value);
+                var db = await _context.Users.SingleOrDefaultAsync(x => x.UserCode == u.UserCode && x.StorageId == 1);
+                if (roleid!=1&&u.UserId!=userid)
+                {
+                    return BadRequest("Khong the thay doi nhan vien");
+                }
                 if (db != null)
                 {
                     var user = mapper.Map<User>(u);
-                    user.StorageId = 1;
-                    user.Email = null;
+                    _context.ChangeTracker.Clear();
                     _context.Update(user);
                     await _context.SaveChangesAsync();
-                    return Ok();
+                    return Ok("Thanh cong");
                 }
                 else
                 {
-                    return BadRequest("Không thể thay đổi mã NV");
+                    return BadRequest("Không thể thay đổi mã NV hoặc nhân viên không tồn tại");
                 }
-
             }
             catch
             {

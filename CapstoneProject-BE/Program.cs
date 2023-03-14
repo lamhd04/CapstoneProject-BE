@@ -28,20 +28,22 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         options.TokenValidationParameters = new TokenValidationParameters()
         {
             ValidateIssuer = true,
+            ValidateLifetime=true,
             ValidateAudience = true,
             ValidAudience = builder.Configuration["Jwt:Audience"],
             ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ClockSkew = TimeSpan.Zero,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
         };
     });
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("Owner", policy =>
-                      policy.RequireClaim("Role", "1"));
+                      policy.RequireClaim("RoleId", "1"));
     options.AddPolicy("Storekeeper", policy =>
-                      policy.RequireClaim("Role", "2"));
+                      policy.RequireClaim("RoleId", "2"));
     options.AddPolicy("Seller", policy =>
-                  policy.RequireClaim("Role", "2"));
+                  policy.RequireClaim("RoleId", "3"));
 });
 //swagger
 builder.Services.AddSwaggerGen(option =>

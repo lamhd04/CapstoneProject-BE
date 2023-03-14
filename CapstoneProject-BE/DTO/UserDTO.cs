@@ -18,5 +18,6 @@ namespace CapstoneProject_BE.DTO
         public bool Status { get; set; }
         public bool Gender { get; set; }
         public DateTime BirthDate { get; set; }
+        public int StorageId { get; set; }
     }
 }

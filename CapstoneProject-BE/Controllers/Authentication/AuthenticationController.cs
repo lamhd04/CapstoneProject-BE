@@ -303,6 +303,7 @@ namespace CapstoneProject_BE.Controllers.Authentication
                         new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                         new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
                         new Claim("UserId", user.UserId.ToString()),
+                        new Claim("RoleId", user.RoleId.ToString()),
                         new Claim("StorageId", user.StorageId.ToString()),
                     };
 
@@ -312,7 +313,7 @@ namespace CapstoneProject_BE.Controllers.Authentication
                     _configuration["Jwt:Issuer"],
                     _configuration["Jwt:Audience"],
                     claims,
-                    expires: DateTime.UtcNow.AddSeconds(15),
+                    expires: DateTime.UtcNow.AddHours(1),
                     signingCredentials: signIn
                 );
 
@@ -325,13 +326,14 @@ namespace CapstoneProject_BE.Controllers.Authentication
             var secretkeyByte = Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]);
             var tokenValidateParameter = new TokenValidationParameters()
             {
+                
                 ValidateIssuer = true,
                 ValidateAudience = true,
                 ValidAudience = _configuration["Jwt:Audience"],
                 ValidIssuer = _configuration["Jwt:Issuer"],
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"])),
                 ClockSkew = TimeSpan.Zero,
-                ValidateLifetime = false
+                ValidateLifetime = true
             };
             try
             {
