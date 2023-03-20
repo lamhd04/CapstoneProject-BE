@@ -20,5 +20,6 @@ namespace CapstoneProject_BE.Models
         public virtual ICollection<Category> Categories { get; set; }
         [JsonIgnore]
         public virtual ICollection<StocktakeNote> StocktakeNotes { get; set; }
+        public virtual ICollection<ReturnsOrder> ReturnsOrders { get; set; }
     }
 }

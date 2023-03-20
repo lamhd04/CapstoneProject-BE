@@ -24,5 +24,6 @@ namespace CapstoneProject_BE.Models
         public virtual ICollection<ImportOrder> ImportOrders { get; set; }
         public int StorageId { get; set; }
         public Storage Storage { get; set; }
+        public virtual ICollection<ReturnsOrder> ReturnsOrders { get; set; }
     }
 }

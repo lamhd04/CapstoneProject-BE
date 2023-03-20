@@ -20,6 +20,8 @@
         public int State { get; set; }
         public virtual User User { get; set; }
         public virtual ICollection<ImportOrderDetail> ImportOrderDetails { get; set; }
+        public virtual ICollection<ReturnsOrder> ReturnsOrders { get; set; }
+        public virtual ICollection<AvailableForReturns> AvailableForReturns { get; set; }
         public virtual Supplier Supplier { get; set; }
         public int StorageId { get; set; }
         public Storage Storage { get; set; }

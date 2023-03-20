@@ -4,6 +4,7 @@ using CapstoneProject_BE.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CapstoneProject_BE.Migrations
 {
     [DbContext(typeof(InventoryManagementContext))]
-    partial class InventoryManagementContextModelSnapshot : ModelSnapshot
+    [Migration("20230318114342_updateReturnsv3")]
+    partial class updateReturnsv3
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -40,37 +42,6 @@ namespace CapstoneProject_BE.Migrations
                     b.HasKey("ActionId");
 
                     b.ToTable("ActionType", (string)null);
-                });
-
-            modelBuilder.Entity("CapstoneProject_BE.Models.AvailableForReturns", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<int>("Available")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("ExportId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("ImportId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ExportId");
-
-                    b.HasIndex("ImportId");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("AvailableForReturns", (string)null);
                 });
 
             modelBuilder.Entity("CapstoneProject_BE.Models.Category", b =>
@@ -564,9 +535,6 @@ namespace CapstoneProject_BE.Migrations
                         .IsRequired()
                         .HasColumnType("int");
 
-                    b.Property<float>("Total")
-                        .HasColumnType("real");
-
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
@@ -592,9 +560,6 @@ namespace CapstoneProject_BE.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DetailId"), 1L, 1);
-
-                    b.Property<int>("Amount")
-                        .HasColumnType("int");
 
                     b.Property<int?>("MeasuredUnitId")
                         .IsRequired()
@@ -817,9 +782,6 @@ namespace CapstoneProject_BE.Migrations
                     b.Property<string>("Identity")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Image")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Password")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -853,31 +815,6 @@ namespace CapstoneProject_BE.Migrations
                     b.HasIndex("StorageId");
 
                     b.ToTable("User", (string)null);
-                });
-
-            modelBuilder.Entity("CapstoneProject_BE.Models.AvailableForReturns", b =>
-                {
-                    b.HasOne("CapstoneProject_BE.Models.ExportOrder", "ExportOrder")
-                        .WithMany("AvailableForReturns")
-                        .HasForeignKey("ExportId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("CapstoneProject_BE.Models.ImportOrder", "ImportOrder")
-                        .WithMany("AvailableForReturns")
-                        .HasForeignKey("ImportId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("CapstoneProject_BE.Models.Product", "Product")
-                        .WithMany("AvailableForReturns")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("ExportOrder");
-
-                    b.Navigation("ImportOrder");
-
-                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("CapstoneProject_BE.Models.Category", b =>
@@ -1239,8 +1176,6 @@ namespace CapstoneProject_BE.Migrations
 
             modelBuilder.Entity("CapstoneProject_BE.Models.ExportOrder", b =>
                 {
-                    b.Navigation("AvailableForReturns");
-
                     b.Navigation("ExportOrderDetails");
 
                     b.Navigation("ReturnsOrders");
@@ -1248,8 +1183,6 @@ namespace CapstoneProject_BE.Migrations
 
             modelBuilder.Entity("CapstoneProject_BE.Models.ImportOrder", b =>
                 {
-                    b.Navigation("AvailableForReturns");
-
                     b.Navigation("ImportOrderDetails");
 
                     b.Navigation("ReturnsOrders");
@@ -1268,8 +1201,6 @@ namespace CapstoneProject_BE.Migrations
 
             modelBuilder.Entity("CapstoneProject_BE.Models.Product", b =>
                 {
-                    b.Navigation("AvailableForReturns");
-
                     b.Navigation("ExportOrderDetails");
 
                     b.Navigation("ImportOrderDetails");

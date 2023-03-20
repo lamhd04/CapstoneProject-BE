@@ -25,6 +25,9 @@ namespace CapstoneProject_BE.Models
         public DbSet<ActionType> ActionTypes { get; set; }
         public DbSet<Storage> Storages { get; set; }
         public DbSet<ProductHistory> ProductHistories { get; set; }
+        public DbSet<ReturnsOrder> ReturnsOrders { get; set; }
+        public DbSet<ReturnsOrderDetail> ReturnsOrderDetails { get; set; }
+        public DbSet<AvailableForReturns> AvailableForReturns { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>(e =>
@@ -199,6 +202,54 @@ namespace CapstoneProject_BE.Models
                 e.HasKey(r => r.DetailId);
                 e.HasOne(r => r.MeasuredUnit)
                 .WithMany(r => r.StocktakeNoteDetails)
+                .HasForeignKey(r => r.MeasuredUnitId).OnDelete(DeleteBehavior.NoAction);
+                e.Property(u => u.DetailId).UseIdentityColumn();
+            });
+            modelBuilder.Entity<AvailableForReturns>(e =>
+            {
+                e.ToTable("AvailableForReturns");
+                e.HasKey(r => r.Id);
+                e.HasOne(r => r.ImportOrder)
+                .WithMany(r => r.AvailableForReturns)
+                .HasForeignKey(r => r.ImportId).OnDelete(DeleteBehavior.NoAction);
+                e.HasOne(r => r.ExportOrder)
+.WithMany(r => r.AvailableForReturns)
+.HasForeignKey(r => r.ExportId).OnDelete(DeleteBehavior.NoAction);
+                e.HasOne(r => r.Product)
+.WithMany(r => r.AvailableForReturns)
+.HasForeignKey(r => r.ProductId).OnDelete(DeleteBehavior.NoAction);
+                e.Property(u => u.Id).UseIdentityColumn();
+            });
+            modelBuilder.Entity<ReturnsOrder>(e =>
+            {
+                e.ToTable("ReturnsOrder");
+                e.HasKey(r => r.ReturnsId);
+                e.HasMany(r => r.ReturnsOrderDetails)
+                .WithOne(r => r.ReturnsOrder)
+                .HasForeignKey(r => r.ReturnsId);
+                e.HasOne(r => r.ImportOrder)
+.WithMany(r => r.ReturnsOrders)
+.HasForeignKey(r => r.ImportId);
+                e.HasOne(r => r.ExportOrder)
+.WithMany(r => r.ReturnsOrders)
+.HasForeignKey(r => r.ExportId);
+                e.HasOne(r => r.User)
+                .WithMany(r => r.ReturnsOrders)
+                .HasForeignKey(r => r.UserId);
+                e.HasOne(r => r.Storage)
+.WithMany(r => r.ReturnsOrders)
+.HasForeignKey(r => r.StorageId);
+                e.HasOne(r => r.Supplier)
+.WithMany(r => r.ReturnsOrders)
+.HasForeignKey(r => r.SupplierId).OnDelete(DeleteBehavior.NoAction);
+                e.Property(u => u.ReturnsId).UseIdentityColumn();
+            });
+            modelBuilder.Entity<ReturnsOrderDetail>(e =>
+            {
+                e.ToTable("ReturnsOrderDetail");
+                e.HasKey(r => r.DetailId);
+                e.HasOne(r => r.MeasuredUnit)
+                .WithMany(r => r.ReturnsOrderDetails)
                 .HasForeignKey(r => r.MeasuredUnitId).OnDelete(DeleteBehavior.NoAction);
                 e.Property(u => u.DetailId).UseIdentityColumn();
             });

@@ -26,6 +26,7 @@ namespace CapstoneProject_BE.Models
         public virtual ICollection<ProductHistory> ProductHistories { get; set; }
         [JsonIgnore]
         public virtual ICollection<ExportOrderDetail> ExportOrderDetails { get; set; }
+        public virtual ICollection<AvailableForReturns> AvailableForReturns { get; set; }
         public Category Category { get; set; }
         public Supplier Supplier { get; set; }
         public string? Barcode { get; set; }

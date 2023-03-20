@@ -13,7 +13,7 @@ namespace CapstoneProject_BE.Models
         public float Discount { get; set; }
         [JsonIgnore]
         public virtual ImportOrder ImportOrder { get; set; }
-        public virtual MeasuredUnit MeasuredUnit { get; set; }
+        public virtual MeasuredUnit? MeasuredUnit { get; set; }
         public virtual Product Product { get; set; }
     }
 }

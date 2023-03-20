@@ -11,11 +11,9 @@ namespace CapstoneProject_BE.DTO
         public string? Identity { get; set; }
         [DataType(DataType.EmailAddress)]
         public string? Email { get; set; }
-        public string Password { get; set; }
         [DataType(DataType.PhoneNumber)]
         public string? Phone { get; set; }
         public int RoleId { get; set; }
-        public bool Status { get; set; }
         public bool Gender { get; set; }
         public DateTime BirthDate { get; set; }
         public int StorageId { get; set; }

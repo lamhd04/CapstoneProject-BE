@@ -31,6 +31,8 @@ namespace CapstoneProject_BE.Models
         public virtual ICollection<EmailToken> EmailTokens { get; set; }
         public int StorageId { get; set; }
         public Storage Storage { get; set; }
+        public string? Image { get; set; }
+        public virtual ICollection<ReturnsOrder> ReturnsOrders { get; set; }
 
     }
 }

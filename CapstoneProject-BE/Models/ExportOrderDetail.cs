@@ -13,7 +13,7 @@ namespace CapstoneProject_BE.Models
         public float Price { get; set; }
         [JsonIgnore]
         public virtual ExportOrder ExportOrder { get; set; }
-        public virtual MeasuredUnit MeasuredUnit { get; set; }
+        public virtual MeasuredUnit? MeasuredUnit { get; set; }
         public virtual Product Product { get; set; }
     }
 }

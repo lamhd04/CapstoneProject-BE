@@ -78,28 +78,28 @@ namespace CapstoneProject_BE.Controllers.Admin
         }
         [Authorize]
         [HttpPut("ChangePassword")]
-        public async Task<IActionResult> ChangePassword(string pwd,string? oldpwd,int? userid=0)
+        public async Task<IActionResult> ChangePassword(PasswordDTO p)
         {
             try
             {
                 var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
                 User result = null;
-                if (userid == 0)
+                if (p.UserId == 0)
                 {
-                    userid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "UserId").Value);
+                    var userid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "UserId").Value);
                     result = await _context.Users.SingleOrDefaultAsync(x => x.UserId == userid);
-                    if (oldpwd != HashHelper.Decrypt(result.Password, _configuration))
+                    if (p.OldPassword != HashHelper.Decrypt(result.Password, _configuration))
                     {
                         return BadRequest("Mật khẩu cũ không đúng");
                     }
                 }
                 else
                 {
-                    result = await _context.Users.SingleOrDefaultAsync(x => x.UserId == userid);
+                    result = await _context.Users.SingleOrDefaultAsync(x => x.UserId == p.UserId);
                 }
                 if (result != null && result.Status)
                 {
-                    result.Password = HashHelper.Encrypt(pwd, _configuration);
+                    result.Password = HashHelper.Encrypt(p.Password, _configuration);
                     await _context.SaveChangesAsync();
                     return Ok("Thành công");
                 }
@@ -224,6 +224,8 @@ namespace CapstoneProject_BE.Controllers.Admin
                 {
                     var user = mapper.Map<User>(u);
                     _context.ChangeTracker.Clear();
+                    user.Password = db.Password;
+                    user.Status = db.Status;
                     _context.Update(user);
                     await _context.SaveChangesAsync();
                     return Ok("Thanh cong");
