@@ -28,6 +28,7 @@ namespace CapstoneProject_BE.Models
         public DbSet<ReturnsOrder> ReturnsOrders { get; set; }
         public DbSet<ReturnsOrderDetail> ReturnsOrderDetails { get; set; }
         public DbSet<AvailableForReturns> AvailableForReturns { get; set; }
+        public DbSet<YearlyData> YearlyDatas { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>(e =>
@@ -93,7 +94,6 @@ namespace CapstoneProject_BE.Models
                 e.Property(u => u.SupplierPhone).IsRequired();
                 e.Property(u => u.Ward).IsRequired();
                 e.Property(u => u.City).IsRequired();
-                e.Property(u => u.Address).IsRequired();
                 e.Property(u => u.District).IsRequired();
                 e.Property(u => u.SupplierId).UseIdentityColumn();
             });
@@ -121,6 +121,10 @@ namespace CapstoneProject_BE.Models
                 e.HasMany(r => r.ExportOrderDetails)
 .WithOne(r => r.Product)
 .HasForeignKey(r => r.ProductId).OnDelete(DeleteBehavior.NoAction);
+                e.Property(p => p.CostPrice).HasDefaultValue(0);
+                e.Property(p => p.InStock).HasDefaultValue(0);
+                e.Property(p => p.SellingPrice).HasDefaultValue(0);
+                e.Property(p => p.StockPrice).HasDefaultValue(0);
                 e.Property(u => u.ProductId).UseIdentityColumn();
             });
 
@@ -252,6 +256,15 @@ namespace CapstoneProject_BE.Models
                 .WithMany(r => r.ReturnsOrderDetails)
                 .HasForeignKey(r => r.MeasuredUnitId).OnDelete(DeleteBehavior.NoAction);
                 e.Property(u => u.DetailId).UseIdentityColumn();
+            });
+            modelBuilder.Entity<YearlyData>(e =>
+            {
+                e.ToTable("YearlyData");
+                e.HasKey(r => r.Id);
+                e.HasOne(r => r.Storage)
+                .WithMany(r => r.YearlyDatas)
+                .HasForeignKey(r => r.StorageId).OnDelete(DeleteBehavior.NoAction);
+                e.Property(u => u.Id).UseIdentityColumn();
             });
             modelBuilder.Entity<ProductHistory>(e =>
             {

@@ -14,8 +14,7 @@ namespace CapstoneProject_BE.DTO
         [DataType(DataType.PhoneNumber)]
         public string? Phone { get; set; }
         public int RoleId { get; set; }
-        public bool Gender { get; set; }
-        public DateTime BirthDate { get; set; }
-        public int StorageId { get; set; }
+        public bool? Gender { get; set; }
+        public DateTime? BirthDate { get; set; }
     }
 }

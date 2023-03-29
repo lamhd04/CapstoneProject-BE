@@ -43,52 +43,8 @@ namespace CapstoneProject_BE.AutoMapper
                 map => map.MapFrom(
                     c => c.MeasuredUnitId==0? null:c.MeasuredUnitId
                     ));
-            CreateMap<ImportOrder, ImportOrderDTO>()
-                .ForMember(cdto => cdto.CreatedDate,
-                map => map.MapFrom(
-                    c => c.Created
-                    ))
-                .ForMember(cdto => cdto.ApprovedDate,
-                map => map.MapFrom(
-                    c => c.Approved==null ? null : c.Approved
-                    ))
-                .ForMember(cdto => cdto.DeniedDate,
-                map => map.MapFrom(
-                    c => c.Denied==null ? null : c.Denied
-                    ))
-                .ForMember(cdto => cdto.CompletedDate,
-                map => map.MapFrom(
-                    c => c.Completed == null ? null : c.Completed
-                    ));
-            CreateMap<ExportOrder, ExportOrderDTO>()
-                .ForMember(cdto => cdto.CreatedDate,
-                map => map.MapFrom(
-                    c => c.Created
-                    ))
-                .ForMember(cdto => cdto.ApprovedDate,
-                map => map.MapFrom(
-                    c => c.Approved == null ? null : c.Approved
-                    ))
-                .ForMember(cdto => cdto.DeniedDate,
-                map => map.MapFrom(
-                    c => c.Denied == null ? null : c.Denied
-                    ))
-                .ForMember(cdto => cdto.CompletedDate,
-                map => map.MapFrom(
-                    c => c.Completed == null ? null : c.Completed
-                    ));
             CreateMap<Category, CategoryDTO>();
             CreateMap<CategoryDTO, Category>();
-            CreateMap<ImportOrderDetail, ImportDetailDTO>()
-                                .ForMember(cdto => cdto.DefaultMeasuredUnit,
-                map => map.MapFrom(
-                    c => c.Product.DefaultMeasuredUnit
-                    ));
-            CreateMap<ExportOrderDetail, ExportDetailDTO>()
-                    .ForMember(cdto => cdto.DefaultMeasuredUnit,
-    map => map.MapFrom(
-        c => c.Product.DefaultMeasuredUnit
-        ));
             CreateMap<ExportOrderDTO, ExportOrder>();
             CreateMap<ExportDetailDTO, ExportOrderDetail>()
                                 .ForMember(cdto => cdto.MeasuredUnitId,

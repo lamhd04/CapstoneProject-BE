@@ -4,6 +4,7 @@ using CapstoneProject_BE.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CapstoneProject_BE.Migrations
 {
     [DbContext(typeof(InventoryManagementContext))]
-    partial class InventoryManagementContextModelSnapshot : ModelSnapshot
+    [Migration("20230322151347_addYearlyData")]
+    partial class addYearlyData
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -380,10 +382,8 @@ namespace CapstoneProject_BE.Migrations
                         .IsRequired()
                         .HasColumnType("int");
 
-                    b.Property<float>("CostPrice")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("real")
-                        .HasDefaultValue(0f);
+                    b.Property<float?>("CostPrice")
+                        .HasColumnType("real");
 
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
@@ -397,15 +397,7 @@ namespace CapstoneProject_BE.Migrations
                     b.Property<string>("Image")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("InStock")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasDefaultValue(0);
-
-                    b.Property<int?>("MaxStock")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("MinStock")
+                    b.Property<int?>("InStock")
                         .HasColumnType("int");
 
                     b.Property<string>("ProductCode")
@@ -415,18 +407,14 @@ namespace CapstoneProject_BE.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<float>("SellingPrice")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("real")
-                        .HasDefaultValue(0f);
+                    b.Property<float?>("SellingPrice")
+                        .HasColumnType("real");
 
                     b.Property<bool?>("Status")
                         .HasColumnType("bit");
 
-                    b.Property<float>("StockPrice")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("real")
-                        .HasDefaultValue(0f);
+                    b.Property<float?>("StockPrice")
+                        .HasColumnType("real");
 
                     b.Property<int>("StorageId")
                         .HasColumnType("int");
@@ -762,6 +750,7 @@ namespace CapstoneProject_BE.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SupplierId"), 1L, 1);
 
                     b.Property<string>("Address")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("City")
@@ -782,6 +771,7 @@ namespace CapstoneProject_BE.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("SupplierEmail")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SupplierName")
@@ -814,13 +804,13 @@ namespace CapstoneProject_BE.Migrations
                     b.Property<string>("Address")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("BirthDate")
+                    b.Property<DateTime>("BirthDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool?>("Gender")
+                    b.Property<bool>("Gender")
                         .HasColumnType("bit");
 
                     b.Property<string>("Identity")

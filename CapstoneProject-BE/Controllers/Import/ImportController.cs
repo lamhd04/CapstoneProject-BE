@@ -7,6 +7,7 @@ using DocumentFormat.OpenXml.Drawing;
 using DocumentFormat.OpenXml.Math;
 using DocumentFormat.OpenXml.Vml;
 using DocumentFormat.OpenXml.Wordprocessing;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -27,6 +28,7 @@ namespace CapstoneProject_BE.Controllers.Import
             var config = new MapperConfiguration(cfg => cfg.AddProfile(new MappingProfile()));
             mapper = config.CreateMapper();
         }
+        [Authorize]
         [HttpPut("UpdateImportOrder")]
         public async Task<IActionResult> UpdateImportOrder(ImportOrderDTO p)
         {
@@ -34,15 +36,15 @@ namespace CapstoneProject_BE.Controllers.Import
             {
                 if (p != null)
                 {
-                    //var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
-                    var dbimport = _context.ImportOrders.Include(a => a.ImportOrderDetails).SingleOrDefault(a => a.ImportId == p.ImportId&&a.StorageId==1);
+                    var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
+                    var dbimport = _context.ImportOrders.Include(a => a.ImportOrderDetails).SingleOrDefault(a => a.ImportId == p.ImportId&&a.StorageId== storageid);
                     var result = mapper.Map<ImportOrder>(p);
                     if (dbimport.State == 0)
                     {
                         _context.RemoveRange(dbimport.ImportOrderDetails);
                         await _context.SaveChangesAsync();
                         _context.ChangeTracker.Clear();
-                        result.StorageId = 1;
+                        result.StorageId = storageid;
                         result.Created = dbimport.Created;
                         _context.Update(result);
                         await _context.SaveChangesAsync();
@@ -63,33 +65,21 @@ namespace CapstoneProject_BE.Controllers.Import
                 return StatusCode(500);
             }
         }
-        [HttpPut("a")]
-        public async Task<IActionResult> a(int b)
-        {
-            try
-            {
-                        var dbimport = _context.ImportOrders.Include(a=>a.ImportOrderDetails).SingleOrDefault(a=>a.ImportId==b);
-                return Ok(dbimport);
-            }
-            catch
-            {
-                return StatusCode(500);
-            }
-        }
+        [Authorize]
         [HttpPost("CreateImportOrder")]
         public async Task<IActionResult> CreateImportOrder(ImportOrderDTO p)
         {
             try
             {
-                //var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
+                var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
                 if (p != null)
                 {
                     var result = mapper.Map<Models.ImportOrder>(p);
                     result.Created = DateTime.Now;
                     result.State = 0;
-                    var code = _context.ImportOrders.Where(x => x.StorageId == 1).Count() + 1;
+                    var code = _context.ImportOrders.Where(x => x.StorageId == storageid).Count() + 1;
                     result.ImportCode = "NAHA" + code;
-                    result.StorageId = 1;
+                    result.StorageId = storageid;
                     _context.Add(result);
                     await _context.SaveChangesAsync();
                     return Ok("Thành công");
@@ -104,12 +94,14 @@ namespace CapstoneProject_BE.Controllers.Import
                 return StatusCode(500);
             }
         }
+        [Authorize(Policy = "Manager")]
         [HttpPost("ApproveImport")]
         public async Task<IActionResult> ApproveImport(int importid)
         {
             try
             {
-                var result = await _context.ImportOrders.SingleOrDefaultAsync(x => x.ImportId == importid);
+                var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
+                var result = await _context.ImportOrders.SingleOrDefaultAsync(x => x.ImportId == importid&&x.StorageId== storageid);
                 if (result != null&&result.State==0)
                 {
                     result.State = 1;
@@ -127,14 +119,16 @@ namespace CapstoneProject_BE.Controllers.Import
                 return StatusCode(500);
             }
         }
+        [Authorize]
         [HttpGet("GetImportOrder")]
         public async Task<IActionResult> GetImport(int offset, int limit, int? supId = 0, int? state = -1, string? code = "")
         {
             try
             {
+                var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
                 var result = await _context.ImportOrders.Include(a=>a.Supplier)
                     .Where(x => (x.Supplier.SupplierName.Contains(code)||x.ImportCode.Contains(code)||code=="")
-                && (x.SupplierId == supId || supId == 0) && (x.State == state || state == -1)
+                && (x.SupplierId == supId || supId == 0) && (x.State == state || state == -1)&&x.StorageId== storageid
                  ).OrderByDescending(x => x.Created).ToListAsync();
                 if (limit > result.Count() && offset >= 0)
                 {
@@ -166,19 +160,58 @@ namespace CapstoneProject_BE.Controllers.Import
                 return StatusCode(500);
             }
         }
+        [Authorize]
         [HttpGet("GetImportDetail")]
         public async Task<IActionResult> GetImportDetail(int importid)
         {
             try
             {
-                //var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
+                var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
                 var result = await _context.ImportOrders
-                    .Include(x=>x.ImportOrderDetails).ThenInclude(x=>x.Product).ThenInclude(x=>x.MeasuredUnits).Include(x=>x.Supplier).Include(x=>x.User)
-                    .SingleOrDefaultAsync(x => x.ImportId == importid&&x.StorageId==1);
+                    .Include(x=>x.ImportOrderDetails).ThenInclude(x=>x.MeasuredUnit).Include(x=>x.Supplier).Include(x=>x.User)
+                    .SingleOrDefaultAsync(x => x.ImportId == importid && x.StorageId == storageid);
                 
                 if (result != null)
-                { 
-                    return Ok(mapper.Map<ImportOrderDTO>(result));
+                {
+                    return Ok(new
+                    {
+                        ApprovedDate=result.Approved,
+                        CreatedDate=result.Created,
+                        DeniedDate=result.Denied,
+                        CompletedDate=result.Completed,
+                        ImportCode=result.ImportCode,
+                        ImportId=result.ImportId,
+                        ImportOrderDetails= from i in result.ImportOrderDetails
+                                       join p in _context.Products.Include(x=>x.MeasuredUnits)
+                                       on i.ProductId equals p.ProductId
+                                       select new {
+                                           ImportId=i.ImportId,
+                                           ProductId=i.ProductId,
+                                           MeasuredUnitId=i.MeasuredUnitId,
+                                           Amount=i.Amount,
+                                           CostPrice=i.CostPrice,
+                                           Discount=i.Discount,
+                                           DefaultMeasuredUnit=p.DefaultMeasuredUnit,
+                                           Product=p,
+                                           MeasuredUnit=i.MeasuredUnit
+                                       },
+                        InDebted=result.InDebted,
+                        Note=result.Note,
+                        OtherExpense=result.OtherExpense,
+                        State=result.State,
+                        Supplier = new {
+                            SupplierId=result.SupplierId,
+                            SupplierName = result.Supplier.SupplierName
+                        },
+                        Total=result.Total,
+                        TotalAmount=result.TotalAmount,
+                        TotalCost=result.TotalCost,
+                        User= new
+                        {
+                            UserId=result.UserId,
+                            UserName=result.User.UserName
+                        }
+                    });
                 }
                 else
                 {
@@ -190,36 +223,72 @@ namespace CapstoneProject_BE.Controllers.Import
                 return StatusCode(500);
             }
         }
+        [Authorize]
         [HttpGet("GetDetail")]
         public async Task<IActionResult> GetImportDetail(string importcode)
         {
             try
             {
-                //var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
+                var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
                 var result = await _context.ImportOrders
-                    .Include(x => x.ImportOrderDetails).ThenInclude(x => x.Product).ThenInclude(x => x.MeasuredUnits).Include(x => x.Supplier).Include(x => x.User)
-                    .SingleOrDefaultAsync(x => x.ImportCode == importcode && x.StorageId == 1);
+                    .Include(x => x.ImportOrderDetails).ThenInclude(x=>x.MeasuredUnit).Include(x => x.Supplier).Include(x => x.User)
+                    .SingleOrDefaultAsync(x => x.ImportCode == importcode && x.StorageId == storageid);
 
-                if (result != null)
+                return Ok(new
                 {
-                    return Ok(mapper.Map<ImportOrderDTO>(result));
-                }
-                else
-                {
-                    return BadRequest("Không có dữ liệu");
-                }
+                    ApprovedDate = result.Approved,
+                    CreatedDate = result.Created,
+                    DeniedDate = result.Denied,
+                    CompletedDate = result.Completed,
+                    ImportCode = result.ImportCode,
+                    ImportId = result.ImportId,
+                    ImportOrderDetails = from i in result.ImportOrderDetails
+                                         join p in _context.Products.Include(x => x.MeasuredUnits)
+                                         on i.ProductId equals p.ProductId 
+                                         select new
+                                         {
+                                             ImportId = i.ImportId,
+                                             ProductId = i.ProductId,
+                                             MeasuredUnitId = i.MeasuredUnitId,
+                                             Amount = i.Amount,
+                                             CostPrice = i.CostPrice,
+                                             Discount = i.Discount,
+                                             DefaultMeasuredUnit = p.DefaultMeasuredUnit,
+                                             Product = p,
+                                             MeasuredUnit = i.MeasuredUnit
+                                         },
+                    InDebted = result.InDebted,
+                    Note = result.Note,
+                    OtherExpense = result.OtherExpense,
+                    State = result.State,
+                    Supplier = new
+                    {
+                        SupplierId = result.SupplierId,
+                        SupplierName = result.Supplier.SupplierName
+                    },
+                    Total = result.Total,
+                    TotalAmount = result.TotalAmount,
+                    TotalCost = result.TotalCost,
+                    User = new
+                    {
+                        UserId = result.UserId,
+                        UserName = result.User.UserName
+                    }
+                });
             }
             catch
             {
                 return StatusCode(500);
             }
         }
+        [Authorize(Policy = "Manager")]
         [HttpPost("DenyImport")]
         public async Task<IActionResult> DenyImport(int importid)
         {
             try
             {
-                var result = await _context.ImportOrders.SingleOrDefaultAsync(x => x.ImportId == importid);
+                var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
+                var result = await _context.ImportOrders.SingleOrDefaultAsync(x => x.ImportId == importid&&x.StorageId==storageid);
                 if (result != null&&result.State==0)
                 {
                     result.State = 3;
@@ -237,13 +306,14 @@ namespace CapstoneProject_BE.Controllers.Import
                 return StatusCode(500);
             }
         }
+        [Authorize(Policy = "Manager")]
         [HttpPost("Import")]
         public async Task<IActionResult> Import(int importid)
         {
             try
             {
-                //var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
-                var result = await _context.ImportOrders.Include(a => a.ImportOrderDetails).SingleOrDefaultAsync(x => x.ImportId == importid&&x.StorageId==1);
+                var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
+                var result = await _context.ImportOrders.Include(a => a.ImportOrderDetails).ThenInclude(x=>x.MeasuredUnit).SingleOrDefaultAsync(x => x.ImportId == importid&&x.StorageId== storageid);
                 if (result != null && result.State == 1)
                 {
                     result.State = 2;
@@ -259,7 +329,6 @@ namespace CapstoneProject_BE.Controllers.Import
                         int total = 0;
                         if (detail.MeasuredUnitId != null)
                         {
-                            detail.MeasuredUnit = await _context.MeasuredUnits.SingleOrDefaultAsync(x => x.MeasuredUnitId == detail.MeasuredUnitId);
                             total = detail.Amount * detail.MeasuredUnit.MeasuredUnitValue;
                             product.InStock += total;
                         }

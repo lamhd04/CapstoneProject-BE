@@ -1,8 +1,12 @@
+
 using CapstoneProject_BE.Models;
+using CapstoneProject_BE.Scheduler;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Quartz;
 using System.Text;
 using System.Text.Json.Serialization;
 
@@ -36,12 +40,35 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
         };
     });
+//quartz
+builder.Services.AddQuartz(q =>
+{
+    q.UseMicrosoftDependencyInjectionScopedJobFactory();
+    // Just use the name of your job that you created in the Jobs folder.
+    var jobKey = new JobKey("InventoryFinalization");
+    var jobKey1 = new JobKey("ClearTrashToken");
+    q.AddJob<InventoryFinalization>(opts => opts.WithIdentity(jobKey));
+    q.AddJob<InventoryFinalization>(opts => opts.WithIdentity(jobKey1));
+    q.AddTrigger(opts => opts
+        .ForJob(jobKey)
+        .WithIdentity("InventoryFinalization-trigger")
+        //This Cron interval can be described as "run every month"
+        .WithCronSchedule("0 0 12 L * ?")
+
+    );
+    q.AddTrigger(opts => opts
+    .ForJob(jobKey1)
+    .WithIdentity("ClearTrashToken-trigger")
+    //This Cron interval can be described as "run every minute" (when second is zero)
+    .WithCronSchedule("0 0 12 L * ?"));
+});
+builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("Owner", policy =>
                       policy.RequireClaim("RoleId", "1"));
-    options.AddPolicy("Storekeeper", policy =>
-                      policy.RequireClaim("RoleId", "2"));
+    options.AddPolicy("Manager", policy =>
+                  policy.RequireClaim("RoleId","1","2"));
     options.AddPolicy("Seller", policy =>
                   policy.RequireClaim("RoleId", "3"));
 });

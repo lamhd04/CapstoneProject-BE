@@ -3,6 +3,7 @@ using BitMiracle.LibTiff.Classic;
 using CapstoneProject_BE.AutoMapper;
 using CapstoneProject_BE.DTO;
 using CapstoneProject_BE.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +13,7 @@ namespace CapstoneProject_BE.Controllers.Product
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class SuppliersController : ControllerBase
     {
         public IConfiguration _configuration;
@@ -29,8 +31,8 @@ namespace CapstoneProject_BE.Controllers.Product
         {
             try
             {
-                //var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
-                var result = await _context.Suppliers.SingleOrDefaultAsync(x => x.SupplierId == supId&&x.StorageId==1);
+                var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
+                var result = await _context.Suppliers.SingleOrDefaultAsync(x => x.SupplierId == supId&&x.StorageId== storageid);
                 if (result != null)
                 {
                     _context.Remove(result);
@@ -53,11 +55,11 @@ namespace CapstoneProject_BE.Controllers.Product
         {
             try
             {
-                //var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
+                var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
                 if (s != null)
                 {
                     var result=mapper.Map<Supplier>(s);
-                    result.StorageId = 1;
+                    result.StorageId = storageid;
                     _context.Add(result);
                     await _context.SaveChangesAsync();
                     return Ok("Thành công");
@@ -78,11 +80,13 @@ namespace CapstoneProject_BE.Controllers.Product
         {
             try
             {
-                //var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
-                var editSupplier = await _context.Suppliers.SingleOrDefaultAsync(x => x.SupplierId == s.SupplierId&&x.StorageId==1);
+                var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
+                var editSupplier = await _context.Suppliers.SingleOrDefaultAsync(x => x.SupplierId == s.SupplierId&&x.StorageId== storageid);
                 if (editSupplier != null)
                 {
                     editSupplier=mapper.Map<Supplier>(s);
+                    editSupplier.StorageId = storageid;
+                    _context.ChangeTracker.Clear();
                     _context.Update(editSupplier);
                     await _context.SaveChangesAsync();
                     return Ok("Thành công");
@@ -100,14 +104,14 @@ namespace CapstoneProject_BE.Controllers.Product
 
         }
         [HttpGet("Get")]
-        public async Task<IActionResult> Get(int offset, int limit, string? search = "")
+        public async Task<IActionResult> Get(int offset, int limit,bool? status=null, string? search = "")
         {
             try
             {
-                //var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
+                var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
                 var result = await _context.Suppliers
-                    .Where(x => x.SupplierName.Contains(search)
-                &&x.StorageId==1).ToListAsync();
+                    .Where(x => (x.SupplierName.Contains(search)||x.SupplierPhone.Contains(search))
+                &&x.StorageId== storageid && (x.Status==status||status==null)).ToListAsync();
                 if (limit > result.Count() && offset >= 0)
                 {
                     return Ok(new ResponseData<Supplier>
@@ -144,8 +148,8 @@ namespace CapstoneProject_BE.Controllers.Product
         {
             try
             {
-                //var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
-                var supplier = await _context.Suppliers.SingleOrDefaultAsync(x=>x.SupplierId==supId&&x.StorageId==1);
+                var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
+                var supplier = await _context.Suppliers.SingleOrDefaultAsync(x=>x.SupplierId==supId&&x.StorageId== storageid);
                 if (supplier != null)
                 {
                     var result = mapper.Map<SupplierDTO>(supplier);                

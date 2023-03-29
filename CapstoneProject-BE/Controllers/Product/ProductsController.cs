@@ -14,11 +14,13 @@ using IronXL;
 using BitMiracle.LibTiff.Classic;
 using System.IdentityModel.Tokens.Jwt;
 using DocumentFormat.OpenXml.Spreadsheet;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CapstoneProject_BE.Controllers.Product
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class ProductsController : ControllerBase
     {
         public IConfiguration _configuration;
@@ -32,14 +34,15 @@ namespace CapstoneProject_BE.Controllers.Product
             this.mapper = config.CreateMapper();
         }
         [HttpGet("Get")]
-        public async Task<IActionResult> Get(int offset, int limit, int? catId = 0, int? supId = 0, string? search = "")
+        public async Task<IActionResult> Get(int offset, int limit,bool? status=null, int? catId = 0, int? supId = 0, string? search = "")
         {
             try
             {
-                //var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
+                var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
                 var result = await _context.Products.Include(x => x.Supplier).Include(x => x.Category).Include(x=>x.MeasuredUnits)
                     .Where(x => (x.ProductCode.Contains(search) || x.ProductName.Contains(search) || x.Barcode.Contains(search))
-                && (x.CategoryId == catId || catId == 0) && (x.SupplierId == supId || supId == 0)&&x.StorageId==1).ToListAsync();
+                && (x.CategoryId == catId || catId == 0) && (x.Status == status || status == null) && (x.SupplierId == supId || supId == 0)&&x.StorageId== storageid)
+                    .OrderByDescending(x=>x.Created).ToListAsync();
                 if (limit > result.Count() && offset >= 0)
                 {
                     return Ok(new ResponseData<Models.Product>
@@ -76,10 +79,10 @@ namespace CapstoneProject_BE.Controllers.Product
         {
             try
             {
-                //var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
+                var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
                 var result = await _context.Products.Include(x => x.Supplier)
                     .Include(x => x.MeasuredUnits).Include(x => x.Category)
-                    .SingleOrDefaultAsync(x => x.ProductId == prodId&&(x.Barcode==barcode||barcode=="")&&x.StorageId==1);
+                    .SingleOrDefaultAsync(x => x.ProductId == prodId&&(x.Barcode==barcode||barcode=="")&&x.StorageId== storageid);
                 var history = await _context.ProductHistories.Where(x => x.ProductId == result.ProductId).Include(x => x.User).Include(x => x.ActionType).OrderByDescending(x=>x.Date).ToListAsync();
                 if (result != null)
                 {
@@ -110,15 +113,15 @@ namespace CapstoneProject_BE.Controllers.Product
         {
             try
             {
-                //var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
-                //var uid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type.Equals("UserId")).Value);
+                var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
+                var uid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type.Equals("UserId")).Value);
                 if (p != null)
                 {
                     var c = mapper.Map<Models.Product>(p);
                     c.Created = DateTime.UtcNow;
                     c.ProductCode = GenerateProductCode(_context.Products.Count()+1);
-                    c.StorageId = 1;
-                    if (c.Barcode == "")
+                    c.StorageId = storageid;
+                    if (c.Barcode == null)
                     {
                         c.Barcode = c.ProductCode;
                     }
@@ -132,7 +135,7 @@ namespace CapstoneProject_BE.Controllers.Product
                     {
                         var history = new ProductHistory
                         {
-                            UserId = 4,
+                            UserId = uid,
                             ActionId = 4,
                             ProductId = c.ProductId,
                             CostPrice = c.CostPrice,
@@ -163,15 +166,15 @@ namespace CapstoneProject_BE.Controllers.Product
         {
             try
             {
-                //var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
-                //var uid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type.Equals("UserId")).Value);
-                var editProduct = await _context.Products.SingleOrDefaultAsync(x => x.ProductId == productDTO.ProductId);
+                var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
+                var uid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type.Equals("UserId")).Value);
+                var editProduct = await _context.Products.SingleOrDefaultAsync(x => x.ProductId == productDTO.ProductId&&x.StorageId== storageid);
                 if (editProduct != null)
                 {
                     _context.Entry(editProduct).State = EntityState.Detached;
                     var result=mapper.Map<Models.Product>(productDTO);
                     result.Created = editProduct.Created;
-                    result.StorageId = 1;
+                    result.StorageId = storageid;
                     if (result.ProductCode == "")
                     {
                         result.ProductCode = GenerateProductCode(productDTO.ProductId);
@@ -184,7 +187,7 @@ namespace CapstoneProject_BE.Controllers.Product
                     var pricedifferential = editProduct.SellingPrice - result.SellingPrice;
                     var history = new ProductHistory
                     {
-                        UserId=4,
+                        UserId=uid,
                         ActionId = 3,
                         ProductId = editProduct.ProductId,
                         CostPrice = editProduct.CostPrice,

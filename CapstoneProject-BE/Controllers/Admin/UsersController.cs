@@ -143,16 +143,26 @@ namespace CapstoneProject_BE.Controllers.Admin
         {
             try
             {
-                //var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
-                var result = await _context.Users
+                var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
+                var result = await _context.Users.Include(x=>x.Role)
                     .Where(x => (x.UserCode.Contains(search)||x.UserName.Contains(search)||x.Phone.Contains(search) || search == "")
-                    && (x.Status == status || status == null)&&(x.RoleId==roleid||roleid==0)
+                    && (x.Status == status || status == null)&&(x.RoleId==roleid||roleid==0)&&x.StorageId==storageid
                  ).OrderBy(x => x.UserName).ToListAsync();
                 if (limit > result.Count() && offset >= 0)
                 {
-                    return Ok(new ResponseData<User>
+                    return Ok(new
                     {
-                        Data = result.Skip(offset).Take(result.Count()).ToList(),
+                        Data = (from u in result
+                                select new
+                                {
+                                    UserId=u.UserId,
+                                    UserCode =u.UserCode,
+                                    Image=u.Image,
+                                    UserName=u.UserName,
+                                    Phone=u.Phone,
+                                    RoleName=u.Role.RoleName,
+                                    Status=u.Status
+                                }).Skip(offset).Take(result.Count()).ToList(),
                         Offset = offset,
                         Limit = limit,
                         Total = result.Count()
@@ -160,9 +170,18 @@ namespace CapstoneProject_BE.Controllers.Admin
                 }
                 else if (offset >= 0)
                 {
-                    return Ok(new ResponseData<User>
+                    return Ok(new
                     {
-                        Data = result.Skip(offset).Take(limit).ToList(),
+                        Data = (from u in result
+                                select new
+                                {
+                                    UserCode = u.UserCode,
+                                    Image = u.Image,
+                                    UserName = u.UserName,
+                                    Phone = u.Phone,
+                                    RoleName = u.Role.RoleName,
+                                    Status = u.Status
+                                }).Skip(offset).Take(limit).ToList(),
                         Offset = offset,
                         Limit = limit,
                         Total = result.Count()
@@ -185,14 +204,14 @@ namespace CapstoneProject_BE.Controllers.Admin
         {
             try
             {
-                //var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
+                var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
                 var db = await _context.Users.SingleOrDefaultAsync(x => x.UserCode == u.UserCode);
                 if (db != null)
                 {
                     return BadRequest("Mã Nhân Viên Đã Tồn Tại");
                 }
                 var user = mapper.Map<User>(u);
-                user.StorageId = 1;
+                user.StorageId = storageid;
                 user.Email = null;
                 user.Password =HashHelper.Encrypt("123456789aA@",_configuration);
                 user.Status = true;
@@ -206,19 +225,54 @@ namespace CapstoneProject_BE.Controllers.Admin
             }
 
         }
+        [Authorize(Policy = "Owner")]
+        [HttpPut("UpdateProfile")]
+        public async Task<IActionResult> UpdateProfile(UserDTO u)
+        {
+            try
+            {
+                var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
+                var userid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "UserId").Value);
+                var db = await _context.Users.SingleOrDefaultAsync(x => x.UserId == u.UserId && x.StorageId == storageid);
+                if (db != null)
+                {
+                    var user = mapper.Map<User>(u);
+                    _context.ChangeTracker.Clear();
+                    user.Password = db.Password;
+                    user.Status = true;
+                    user.StorageId = storageid;
+                    if (user.Email != db.Email)
+                    {
+                        return BadRequest("Khong the thay doi email");
+                    }
+                    _context.Update(user);
+                    await _context.SaveChangesAsync();
+                    return Ok("Thanh cong");
+                }
+                else
+                {
+                    return BadRequest("Người dùng ko tồn tại");
+                }
+            }
+            catch
+            {
+                return StatusCode(500);
+            }
+
+        }
         [Authorize]
         [HttpPut("UpdateStaff")]
         public async Task<IActionResult> UpdateStaff(UserDTO u)
         {
             try
             {
-                //var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
+                var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
                 var userid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "UserId").Value);
                 var roleid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "RoleId").Value);
-                var db = await _context.Users.SingleOrDefaultAsync(x => x.UserCode == u.UserCode && x.StorageId == 1);
-                if (roleid!=1&&u.UserId!=userid)
+                var db = await _context.Users.SingleOrDefaultAsync(x => x.UserCode == u.UserCode && x.StorageId == storageid);
+                if (roleid != 1 && userid != db.UserId)
                 {
-                    return BadRequest("Khong the thay doi nhan vien");
+                    return BadRequest("Không thể update nhân viên này");
                 }
                 if (db != null)
                 {
@@ -226,13 +280,18 @@ namespace CapstoneProject_BE.Controllers.Admin
                     _context.ChangeTracker.Clear();
                     user.Password = db.Password;
                     user.Status = db.Status;
+                    user.StorageId = storageid;
+                    if (user.RoleId == 1)
+                    {
+                        return BadRequest("Không thể cập nhật");
+                    }
                     _context.Update(user);
                     await _context.SaveChangesAsync();
                     return Ok("Thanh cong");
                 }
                 else
                 {
-                    return BadRequest("Không thể thay đổi mã NV hoặc nhân viên không tồn tại");
+                    return BadRequest("Người dùng ko tồn tại");
                 }
             }
             catch

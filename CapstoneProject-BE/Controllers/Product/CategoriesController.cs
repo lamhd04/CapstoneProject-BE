@@ -2,6 +2,7 @@
 using CapstoneProject_BE.AutoMapper;
 using CapstoneProject_BE.DTO;
 using CapstoneProject_BE.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +11,7 @@ namespace CapstoneProject_BE.Controllers.Product
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class CategoriesController : ControllerBase
     {
         public IMapper mapper;
@@ -27,8 +29,8 @@ namespace CapstoneProject_BE.Controllers.Product
         {
             try
             {
-                //var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
-                var result = await _context.Categories.SingleOrDefaultAsync(x => x.CategoryId == catId && x.StorageId == 1);
+                var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
+                var result = await _context.Categories.SingleOrDefaultAsync(x => x.CategoryId == catId && x.StorageId == storageid);
                 if (result != null)
                 {
                     _context.Remove(result);
@@ -51,11 +53,11 @@ namespace CapstoneProject_BE.Controllers.Product
         {
             try
             {
-                //var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
+                var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
                 if (c != null)
                 {
                     var result = mapper.Map<Category>(c);
-                    result.StorageId = 1;
+                    result.StorageId = storageid;
                     _context.Add(result);
                     await _context.SaveChangesAsync();
                     return Ok("Thành công");
@@ -76,8 +78,8 @@ namespace CapstoneProject_BE.Controllers.Product
         {
             try
             {
-                //var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
-                var editProduct = await _context.Categories.SingleOrDefaultAsync(x => x.CategoryId == c.CategoryId && x.StorageId == 1);
+                var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
+                var editProduct = await _context.Categories.SingleOrDefaultAsync(x => x.CategoryId == c.CategoryId && x.StorageId == storageid);
                 if (editProduct != null)
                 {
                     editProduct.CategoryName = c.CategoryName;
@@ -102,10 +104,10 @@ namespace CapstoneProject_BE.Controllers.Product
         {
             try
             {
-                //var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
+                var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
                 var result = await _context.Categories
                     .Where(x =>x.CategoryName.Contains(search)
-                &&x.StorageId==1).ToListAsync();
+                &&x.StorageId==storageid).ToListAsync();
                 if (limit > result.Count() && offset >= 0)
                 {
                     return Ok(new ResponseData<Category>
@@ -142,8 +144,8 @@ namespace CapstoneProject_BE.Controllers.Product
         {
             try
             {
-                //var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
-                var result = await _context.Categories.SingleOrDefaultAsync(x => x.CategoryId == catId && x.StorageId == 1);
+                var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
+                var result = await _context.Categories.SingleOrDefaultAsync(x => x.CategoryId == catId && x.StorageId == storageid);
                 if (result != null)
                 {
                     return Ok(result);

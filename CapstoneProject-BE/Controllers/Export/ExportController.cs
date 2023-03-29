@@ -3,6 +3,7 @@ using CapstoneProject_BE.AutoMapper;
 using CapstoneProject_BE.DTO;
 using CapstoneProject_BE.Helper;
 using CapstoneProject_BE.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -23,6 +24,7 @@ namespace CapstoneProject_BE.Controllers.Export
             var config = new MapperConfiguration(cfg => cfg.AddProfile(new MappingProfile()));
             mapper = config.CreateMapper();
         }
+        [Authorize]
         [HttpPut("UpdateExportOrder")]
         public async Task<IActionResult> UpdateExportOrder(ExportOrderDTO p)
         {
@@ -31,8 +33,8 @@ namespace CapstoneProject_BE.Controllers.Export
 
                 if (p != null)
                 {
-                    //var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
-                    var dbimport = _context.ExportOrders.Include(a => a.ExportOrderDetails).SingleOrDefault(a => a.ExportId == p.ExportId && a.StorageId == 1);
+                    var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
+                    var dbimport = _context.ExportOrders.Include(a => a.ExportOrderDetails).SingleOrDefault(a => a.ExportId == p.ExportId && a.StorageId == storageid);
                     var result = mapper.Map<ExportOrder>(p);
                     if (dbimport.State == 0)
                     {
@@ -60,6 +62,7 @@ namespace CapstoneProject_BE.Controllers.Export
                 return StatusCode(500);
             }
         }
+        [Authorize]
         [HttpPost("CreateExportOrder")]
         public async Task<IActionResult> CreateExportOrder(ExportOrderDTO p)
         {
@@ -67,13 +70,13 @@ namespace CapstoneProject_BE.Controllers.Export
             {
                 if (p != null)
                 {
-                    //var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
+                    var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
                     var result = mapper.Map<ExportOrder>(p);
                     result.Created = DateTime.Now;
                     result.State = 0;
-                    var code = _context.ExportOrders.Where(x => x.StorageId == 1).Count() + 1;
+                    var code = _context.ExportOrders.Where(x => x.StorageId == storageid).Count() + 1;
                     result.ExportCode ="XAHA"+code;
-                    result.StorageId = 1;
+                    result.StorageId = storageid;
                     _context.Add(result);
                     await _context.SaveChangesAsync();
                     return Ok("Thành công");
@@ -88,6 +91,7 @@ namespace CapstoneProject_BE.Controllers.Export
                 return StatusCode(500);
             }
         }
+        [Authorize(Policy = "Manager")]
         [HttpPost("ApproveExport")]
         public async Task<IActionResult> ApproveExport(int exportId)
         {
@@ -111,15 +115,16 @@ namespace CapstoneProject_BE.Controllers.Export
                 return StatusCode(500);
             }
         }
+        [Authorize]
         [HttpGet("GetExportOrder")]
         public async Task<IActionResult> GetExport(int offset, int limit, int? supId = 0, int? state = -1, string? code = "")
         {
             try
             {
-                //var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
+                var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
                 var result = await _context.ExportOrders
                     .Where(x => (x.ExportCode.Contains(code) || code == "")
-                 && (x.State == state || state == -1)
+                 && (x.State == state || state == -1)&&x.StorageId== storageid
                  ).OrderByDescending(x => x.Created).ToListAsync();
                 if (limit > result.Count() && offset >= 0)
                 {
@@ -151,6 +156,7 @@ namespace CapstoneProject_BE.Controllers.Export
                 return StatusCode(500);
             }
         }
+        [Authorize]
         [HttpGet("GetExportDetail")]
         public async Task<IActionResult> GetExportDetail(int exportId)
         {
@@ -158,11 +164,45 @@ namespace CapstoneProject_BE.Controllers.Export
             {
                 //var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
                 var result = await _context.ExportOrders
-                    .Include(x => x.ExportOrderDetails).ThenInclude(x => x.Product).ThenInclude(x=>x.MeasuredUnits).Include(x => x.User)
+                    .Include(x => x.ExportOrderDetails).ThenInclude(x => x.MeasuredUnit).Include(x => x.User)
                     .SingleOrDefaultAsync(x => x.ExportId == exportId);
+
                 if (result != null)
                 {
-                    return Ok(mapper.Map<ExportOrderDTO>(result));
+                    return Ok(new
+                    {
+                        ApprovedDate = result.Approved,
+                        CreatedDate = result.Created,
+                        DeniedDate = result.Denied,
+                        CompletedDate = result.Completed,
+                        ExportCode = result.ExportCode,
+                        ExportId = result.ExportId,
+                        ExportOrderDetails = from i in result.ExportOrderDetails
+                                             join p in _context.Products.Include(x => x.MeasuredUnits)
+                                             on i.ProductId equals p.ProductId
+                                             select new
+                                             {
+                                                 ExportId = i.ExportId,
+                                                 ProductId = i.ProductId,
+                                                 MeasuredUnitId = i.MeasuredUnitId,
+                                                 Amount = i.Amount,
+                                                 Price = i.Price,
+                                                 Discount = i.Discount,
+                                                 DefaultMeasuredUnit = p.DefaultMeasuredUnit,
+                                                 Product = p,
+                                                 MeasuredUnit = i.MeasuredUnit
+                                             },
+                        Note = result.Note,
+                        State = result.State,
+                        Total = result.Total,
+                        TotalAmount = result.TotalAmount,
+                        TotalPrice = result.TotalPrice,
+                        User = new
+                        {
+                            UserId = result.UserId,
+                            UserName = result.User.UserName
+                        }
+                    });
                 }
                 else
                 {
@@ -174,18 +214,53 @@ namespace CapstoneProject_BE.Controllers.Export
                 return StatusCode(500);
             }
         }
+        [Authorize]
         [HttpGet("GetDetail")]
         public async Task<IActionResult> GetExportDetail(string exportcode)
         {
             try
             {
-                //var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
+                var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
                 var result = await _context.ExportOrders
-                    .Include(x => x.ExportOrderDetails).ThenInclude(x => x.Product).ThenInclude(x => x.MeasuredUnits).Include(x => x.User)
-                    .SingleOrDefaultAsync(x => x.ExportCode == exportcode&&x.StorageId==1);
+                    .Include(x => x.ExportOrderDetails).ThenInclude(x => x.MeasuredUnit).Include(x => x.User)
+                    .SingleOrDefaultAsync(x => x.ExportCode == exportcode && x.StorageId == storageid);
+
                 if (result != null)
                 {
-                    return Ok(result);
+                    return Ok(new
+                    {
+                        ApprovedDate = result.Approved,
+                        CreatedDate = result.Created,
+                        DeniedDate = result.Denied,
+                        CompletedDate = result.Completed,
+                        ExportCode = result.ExportCode,
+                        ExportId = result.ExportId,
+                        ExportOrderDetails = from i in result.ExportOrderDetails
+                                             join p in _context.Products.Include(x => x.MeasuredUnits)
+                                             on i.ProductId equals p.ProductId
+                                             select new
+                                             {
+                                                 ExportId = i.ExportId,
+                                                 ProductId = i.ProductId,
+                                                 MeasuredUnitId = i.MeasuredUnitId,
+                                                 Amount = i.Amount,
+                                                 Price = i.Price,
+                                                 Discount = i.Discount,
+                                                 DefaultMeasuredUnit = p.DefaultMeasuredUnit,
+                                                 Product = p,
+                                                 MeasuredUnit = i.MeasuredUnit
+                                             },
+                        Note = result.Note,
+                        State = result.State,
+                        Total = result.Total,
+                        TotalAmount = result.TotalAmount,
+                        TotalPrice = result.TotalPrice,
+                        User = new
+                        {
+                            UserId = result.UserId,
+                            UserName = result.User.UserName
+                        }
+                    });
                 }
                 else
                 {
@@ -197,6 +272,7 @@ namespace CapstoneProject_BE.Controllers.Export
                 return StatusCode(500);
             }
         }
+        [Authorize(Policy = "Manager")]
         [HttpPost("DenyImport")]
         public async Task<IActionResult> DenyExport(int exportId)
         {
@@ -221,13 +297,14 @@ namespace CapstoneProject_BE.Controllers.Export
                 return StatusCode(500);
             }
         }
+        [Authorize(Policy = "Manager")]
         [HttpPost("Export")]
         public async Task<IActionResult> Export(int exportId)
         {
             try
             {
                 //var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
-                var result = await _context.ExportOrders.Include(a => a.ExportOrderDetails).SingleOrDefaultAsync(x => x.ExportId == exportId);
+                var result = await _context.ExportOrders.Include(a => a.ExportOrderDetails).ThenInclude(x=>x.MeasuredUnit).SingleOrDefaultAsync(x => x.ExportId == exportId);
                 if (result != null && result.State == 1)
                 {
                     result.State = 2;
@@ -243,7 +320,6 @@ namespace CapstoneProject_BE.Controllers.Export
                         int total = 0;
                         if (detail.MeasuredUnitId != null)
                         {
-                            detail.MeasuredUnit = await _context.MeasuredUnits.SingleOrDefaultAsync(x => x.MeasuredUnitId == detail.MeasuredUnitId);
                             total = detail.Amount * detail.MeasuredUnit.MeasuredUnitValue;
                             if (total > product.InStock)
                                 return BadRequest("Số lượng xuất lớn hơn tồn kho");

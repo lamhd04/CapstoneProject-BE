@@ -2,6 +2,7 @@
 using CapstoneProject_BE.AutoMapper;
 using CapstoneProject_BE.DTO;
 using CapstoneProject_BE.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +11,7 @@ namespace CapstoneProject_BE.Controllers.Returns
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class ReturnsController : ControllerBase
     {
         public IConfiguration _configuration;
@@ -22,18 +24,19 @@ namespace CapstoneProject_BE.Controllers.Returns
             var config = new MapperConfiguration(cfg => cfg.AddProfile(new MappingProfile()));
             mapper = config.CreateMapper();
         }
+        
         [HttpPost("Create")]
         public async Task<IActionResult> Create([FromBody] ReturnsDTO p)
         {
             try
             {
-                //var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
-                //var userid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "UserId").Value);
+                var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
+                var userid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "UserId").Value);
                 if (p != null)
                 {
                     var result = mapper.Map<ReturnsOrder>(p);
                     result.Created = DateTime.Now;
-                    var code = (_context.ReturnsOrders.Where(x => x.StorageId == 1).Count() + 1);
+                    var code = (_context.ReturnsOrders.Where(x => x.StorageId == storageid).Count() + 1);
                     if (result.ImportId == null)
                     {
                         result.ReturnsCode = "HOHA" + code;
@@ -42,7 +45,7 @@ namespace CapstoneProject_BE.Controllers.Returns
                     {
                         result.ReturnsCode = "TAHA" + code;
                     }
-                    result.StorageId = 1;
+                    result.StorageId = storageid;
                     
                     foreach(var a in result.ReturnsOrderDetails)
                     {
@@ -178,18 +181,19 @@ namespace CapstoneProject_BE.Controllers.Returns
         {
             try
             {
+                var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
                 List<ReturnsOrder> result = new List<ReturnsOrder>();
                 if (type == "import")
                 {
                     result = await _context.ReturnsOrders.Include(x => x.User).Include(x => x.Supplier)
                         .Where(x => (x.ReturnsCode.Contains(code) || x.User.UserName.Contains(code) || x.Supplier.SupplierName.Contains(code))
-                    && (x.SupplierId == suppid || suppid == 0) && x.ExportId == null
+                    && (x.SupplierId == suppid || suppid == 0) && x.ExportId == null && x.StorageId== storageid
                      ).OrderByDescending(x => x.Created).ToListAsync();
                 }
                 else
                 {
                     result = await _context.ReturnsOrders.Include(x => x.User)
-    .Where(x => (x.ReturnsCode.Contains(code) || x.User.UserName.Contains(code)) && x.ImportId == null
+    .Where(x => (x.ReturnsCode.Contains(code) || x.User.UserName.Contains(code)) && x.ImportId == null &&x.StorageId== storageid
  ).OrderByDescending(x => x.Created).ToListAsync();
                 }
 
@@ -228,11 +232,11 @@ namespace CapstoneProject_BE.Controllers.Returns
         {
             try
             {
-                //var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
+                var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
                 var result = await _context.ReturnsOrders
                     .Include(x => x.ReturnsOrderDetails).ThenInclude(x => x.Product).ThenInclude(x => x.MeasuredUnits)
                     .Include(x=>x.Supplier).Include(x=>x.User)
-                    .SingleOrDefaultAsync(x => x.ReturnsId == returnid && x.StorageId == 1);
+                    .SingleOrDefaultAsync(x => x.ReturnsId == returnid && x.StorageId == storageid);
 
                 if (result != null)
                 {
@@ -253,11 +257,11 @@ namespace CapstoneProject_BE.Controllers.Returns
         {
             try
             {
-                //var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
+                var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
                 var result = await _context.ReturnsOrders
                     .Include(x => x.ReturnsOrderDetails).ThenInclude(x => x.Product).ThenInclude(x => x.MeasuredUnits)
                     .Include(x => x.Supplier).Include(x => x.User)
-                    .SingleOrDefaultAsync(x => x.ReturnsCode == returncode && x.StorageId == 1);
+                    .SingleOrDefaultAsync(x => x.ReturnsCode == returncode && x.StorageId == storageid);
 
                 if (result != null)
                 {

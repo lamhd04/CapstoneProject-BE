@@ -10,8 +10,5 @@ namespace CapstoneProject_BE.DTO
         public int Amount { get; set; }
         public float CostPrice { get; set; }
         public float Discount { get; set; }
-        public string? DefaultMeasuredUnit { get; set; }
-        public virtual MeasuredUnit? MeasuredUnit { get; set; }
-        public virtual Product? Product { get; set; }
     }
 }
