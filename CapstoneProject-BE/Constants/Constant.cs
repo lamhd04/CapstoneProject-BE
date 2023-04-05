@@ -1,9 +1,11 @@
 ﻿using System.Runtime.ConstrainedExecution;
+using System.Text.RegularExpressions;
 
 namespace CapstoneProject_BE.Constants
 {
-    public class Constant
+    public static class Constant
     {
-        public static readonly int Constant0 = 1;
+        public static readonly string ClientUrl= "https://imsd-capstoneproject-fe.vercel.app";
+        public static readonly Regex validateGuidRegex = new Regex("^(?=.*?[A-Z])(?=.*?[0-9]).{6,32}$");
     }
 }

@@ -4,9 +4,9 @@ namespace CapstoneProject_BE.DTO
 {
     public class LoginModel
     {
-        [Required]
+        public string? Usercode { get; set; }
         [DataType(DataType.EmailAddress)]
-        public string Email { get; set; }
+        public string? Email { get; set; }
         [Required]
         public string Password { get; set; }
     }
