@@ -257,7 +257,7 @@ namespace CapstoneProject_BE.Controllers.Stock
                                                  ActualStock = i.ActualStock,
                                                  AmountDifferential = i.AmountDifferential,
                                                  CurrentStock = i.CurrentStock,
-                                                 StocktakeNote=i.StocktakeNote,
+                                                 Note=i.Note,
                                                  DefaultMeasuredUnit = p.DefaultMeasuredUnit,
                                                  Product = p,
                                                  MeasuredUnit = i.MeasuredUnit
@@ -317,7 +317,7 @@ namespace CapstoneProject_BE.Controllers.Stock
                                                    ActualStock = i.ActualStock,
                                                    AmountDifferential = i.AmountDifferential,
                                                    CurrentStock = i.CurrentStock,
-                                                   StocktakeNote = i.StocktakeNote,
+                                                   Note = i.Note,
                                                    DefaultMeasuredUnit = p.DefaultMeasuredUnit,
                                                    Product = p,
                                                    MeasuredUnit = i.MeasuredUnit

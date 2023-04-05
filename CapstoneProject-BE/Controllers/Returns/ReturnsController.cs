@@ -60,7 +60,8 @@ namespace CapstoneProject_BE.Controllers.Returns
                         {
                             if (_context.AvailableForReturns.SingleOrDefault(x => x.ExportId == afr.ExportId&&x.ProductId==a.ProductId) == null)
                             {
-                                afr.Available = _context.ExportOrderDetails.SingleOrDefault(x => x.ProductId == a.ProductId && x.ExportId == afr.ExportId).Amount - a.Amount;
+                                var order = _context.ExportOrderDetails.SingleOrDefault(x => x.ProductId == a.ProductId && x.ExportId == afr.ExportId);
+                                afr.Available = order.Amount - a.Amount;
                                 _context.Add(afr);
                             }
 
@@ -78,7 +79,8 @@ namespace CapstoneProject_BE.Controllers.Returns
                         {
                             if (_context.AvailableForReturns.SingleOrDefault(x => x.ImportId == afr.ImportId && x.ProductId == a.ProductId) == null)
                             {
-                                afr.Available = _context.ImportOrderDetails.SingleOrDefault(x => x.ProductId == a.ProductId && x.ImportId == afr.ImportId).Amount - a.Amount;
+                                var order = _context.ImportOrderDetails.SingleOrDefault(x => x.ProductId == a.ProductId && x.ImportId == afr.ImportId);
+                                afr.Available = order.Amount - a.Amount;
                                 _context.Add(afr);
                             }
                             else
@@ -89,6 +91,29 @@ namespace CapstoneProject_BE.Controllers.Returns
                                 _context.ChangeTracker.Clear();
                                 _context.Update(afr);
                             }
+                            var product = _context.Products.SingleOrDefault(x => x.ProductId == a.ProductId);
+                            if (a.MeasuredUnitId != null)
+                            {
+                                a.MeasuredUnit = await _context.MeasuredUnits.SingleOrDefaultAsync(x => x.MeasuredUnitId == a.MeasuredUnitId);
+                                product.InStock -= a.Amount * a.MeasuredUnit.MeasuredUnitValue;
+                            }
+                            else
+                            {
+                                product.InStock -= a.Amount;
+                            }
+                            var history = new ProductHistory
+                            {
+                                ProductId=a.ProductId,
+                                ActionCode = result.ReturnsCode,
+                                ActionId=1002,
+                                Amount=product.InStock,
+                                AmountDifferential=a.MeasuredUnitId!=null?$"-{a.Amount * a.MeasuredUnit.MeasuredUnitValue}":$"-{a.Amount}",
+                                UserId=userid,
+                                Note=result.Note,
+                                Date=DateTime.Now
+                            };
+                            _context.Add(history);
+                            await _context.SaveChangesAsync();
                         }
                     }
                     _context.Add(result);
@@ -177,7 +202,7 @@ namespace CapstoneProject_BE.Controllers.Returns
             }
         }
         [HttpGet("Get")]
-        public async Task<IActionResult> Get(int offset, int limit,string type, int? suppid = 0, string? code = "")
+        public async Task<IActionResult> Get(int offset, int limit,string type, int? supId = 0, string? code = "")
         {
             try
             {
@@ -187,7 +212,7 @@ namespace CapstoneProject_BE.Controllers.Returns
                 {
                     result = await _context.ReturnsOrders.Include(x => x.User).Include(x => x.Supplier)
                         .Where(x => (x.ReturnsCode.Contains(code) || x.User.UserName.Contains(code) || x.Supplier.SupplierName.Contains(code))
-                    && (x.SupplierId == suppid || suppid == 0) && x.ExportId == null && x.StorageId== storageid
+                    && (x.SupplierId == supId || supId == 0) && x.ExportId == null && x.StorageId== storageid
                      ).OrderByDescending(x => x.Created).ToListAsync();
                 }
                 else
@@ -277,6 +302,64 @@ namespace CapstoneProject_BE.Controllers.Returns
                 return StatusCode(500);
             }
         }
-    
+        [HttpPost("ReImport")]
+        public async Task<IActionResult> ReImport(int returnid)
+        {
+            try
+            {
+                var userid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "UserId").Value);
+                var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
+                //var result = from s in _context.ReturnsOrderDetails
+                //             join a in _context.MeasuredUnits on s.MeasuredUnitId equals a.MeasuredUnitId
+                //             where s.ReturnsId==returnid
+                //             select new
+                //             {
+                //                 MeasuredUnit=a,
+                //                 MeasuredUnitId=a.MeasuredUnitId,
+                //                 ProductId=s.ProductId,
+                //                 Amount=s.Amount
+                //             };
+                var order = await _context.ReturnsOrders
+                    .Include(x => x.ReturnsOrderDetails).ThenInclude(x => x.Product).ThenInclude(x => x.MeasuredUnits)
+                    .SingleOrDefaultAsync(x => x.ReturnsId == returnid && x.StorageId == storageid);
+                if (order != null)
+                {
+                    foreach (var a in order.ReturnsOrderDetails)
+                    {
+                        var product = _context.Products.SingleOrDefault(x => x.ProductId == a.ProductId);
+                        if (a.MeasuredUnit != null)
+                        {
+                            product.InStock += a.Amount * a.MeasuredUnit.MeasuredUnitValue;
+                        }
+                        else
+                        {
+                            product.InStock += a.Amount;
+                        }
+                        var history = new ProductHistory
+                        {
+                            ProductId = a.ProductId,
+                            ActionCode = order.ReturnsCode,
+                            ActionId = 1002,
+                            Amount=product.InStock,
+                            AmountDifferential = a.MeasuredUnitId != null ? $"+{a.Amount * a.MeasuredUnit.MeasuredUnitValue}" : $"+{a.Amount}",
+                            UserId = userid,
+                            Date = DateTime.Now
+                        };
+                        _context.Add(history);
+                        await _context.SaveChangesAsync();
+                    }
+                    return Ok();
+                }
+                else
+                {
+                    return BadRequest("Không có dữ liệu");
+                }
+            }
+            catch
+            {
+                return StatusCode(500);
+            }
+        }
+
     }
 }
