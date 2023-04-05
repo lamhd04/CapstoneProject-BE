@@ -1,4 +1,6 @@
-﻿namespace CapstoneProject_BE.Models
+﻿using System.Text.Json.Serialization;
+
+namespace CapstoneProject_BE.Models
 {
     public class StocktakeNoteDetail
     {
@@ -10,6 +12,7 @@
         public int ActualStock { get; set; }
         public int AmountDifferential { get; set; }
         public string? Note { get; set; }
+        [JsonIgnore]
         public virtual StocktakeNote StocktakeNote { get; set; }
         public virtual Product Product { get; set; }
         public virtual MeasuredUnit MeasuredUnit { get; set; }

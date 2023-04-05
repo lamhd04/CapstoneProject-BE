@@ -16,5 +16,6 @@ namespace CapstoneProject_BE.DTO
         public int RoleId { get; set; }
         public bool? Gender { get; set; }
         public DateTime? BirthDate { get; set; }
+        public string Image { get; set; }
     }
 }
