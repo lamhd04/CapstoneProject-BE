@@ -36,6 +36,7 @@ namespace CapstoneProject_BE.Controllers.Returns
                 {
                     var result = mapper.Map<ReturnsOrder>(p);
                     result.Created = DateTime.Now;
+                    result.State = 0;
                     var code = (_context.ReturnsOrders.Where(x => x.StorageId == storageid).Count() + 1);
                     if (result.ImportId == null)
                     {
@@ -322,8 +323,10 @@ namespace CapstoneProject_BE.Controllers.Returns
                 var order = await _context.ReturnsOrders
                     .Include(x => x.ReturnsOrderDetails).ThenInclude(x => x.Product).ThenInclude(x => x.MeasuredUnits)
                     .SingleOrDefaultAsync(x => x.ReturnsId == returnid && x.StorageId == storageid);
-                if (order != null)
+                if (order != null&&order.State==0)
                 {
+                    order.State = 1;
+                    order.Imported = DateTime.Now;
                     foreach (var a in order.ReturnsOrderDetails)
                     {
                         var product = _context.Products.SingleOrDefault(x => x.ProductId == a.ProductId);

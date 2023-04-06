@@ -8,11 +8,13 @@
         public int? SupplierId { get; set; }
         public int UserId { get; set; }
         public DateTime Created { get; set; }
+        public DateTime? Imported { get; set; }
         public string? Note { get; set; }
         public string? Media { get; set; }
         public float Total { get; set; }
         public int StorageId { get; set; }
         public string ReturnsCode { get; set; }
+        public int State { get; set; }
         public virtual ImportOrder ImportOrder { get; set; }
         public virtual Storage Storage { get; set; }
         public virtual ExportOrder ExportOrder { get; set; }
