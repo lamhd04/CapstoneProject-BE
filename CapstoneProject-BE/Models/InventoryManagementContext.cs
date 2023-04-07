@@ -204,9 +204,6 @@ namespace CapstoneProject_BE.Models
             {
                 e.ToTable("StocktakeNoteDetail");
                 e.HasKey(r => r.DetailId);
-                e.HasOne(r => r.MeasuredUnit)
-                .WithMany(r => r.StocktakeNoteDetails)
-                .HasForeignKey(r => r.MeasuredUnitId).OnDelete(DeleteBehavior.NoAction);
                 e.Property(u => u.DetailId).UseIdentityColumn();
             });
             modelBuilder.Entity<AvailableForReturns>(e =>

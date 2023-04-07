@@ -4,6 +4,7 @@ using CapstoneProject_BE.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CapstoneProject_BE.Migrations
 {
     [DbContext(typeof(InventoryManagementContext))]
-    partial class InventoryManagementContextModelSnapshot : ModelSnapshot
+    [Migration("20230406034505_updateReturns")]
+    partial class updateReturns
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -558,9 +560,6 @@ namespace CapstoneProject_BE.Migrations
                     b.Property<int?>("ImportId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("Imported")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("Media")
                         .HasColumnType("nvarchar(max)");
 
@@ -718,6 +717,7 @@ namespace CapstoneProject_BE.Migrations
                         .HasColumnType("int");
 
                     b.Property<int?>("MeasuredUnitId")
+                        .IsRequired()
                         .HasColumnType("int");
 
                     b.Property<string>("Note")
@@ -1211,9 +1211,11 @@ namespace CapstoneProject_BE.Migrations
 
             modelBuilder.Entity("CapstoneProject_BE.Models.StocktakeNoteDetail", b =>
                 {
-                    b.HasOne("CapstoneProject_BE.Models.MeasuredUnit", null)
+                    b.HasOne("CapstoneProject_BE.Models.MeasuredUnit", "MeasuredUnit")
                         .WithMany("StocktakeNoteDetails")
-                        .HasForeignKey("MeasuredUnitId");
+                        .HasForeignKey("MeasuredUnitId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
 
                     b.HasOne("CapstoneProject_BE.Models.Product", "Product")
                         .WithMany()
@@ -1226,6 +1228,8 @@ namespace CapstoneProject_BE.Migrations
                         .HasForeignKey("StocktakeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("MeasuredUnit");
 
                     b.Navigation("Product");
 

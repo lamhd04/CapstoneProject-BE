@@ -16,8 +16,6 @@ namespace CapstoneProject_BE.Models
         [JsonIgnore]
         public virtual ICollection<ExportOrderDetail> ExportOrderDetails { get; set; }
         [JsonIgnore]
-        public virtual ICollection<StocktakeNoteDetail> StocktakeNoteDetails { get; set; }
-        [JsonIgnore]
         public virtual ICollection<ReturnsOrderDetail> ReturnsOrderDetails { get; set; }
     }
 }

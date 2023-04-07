@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using CapstoneProject_BE.AutoMapper;
+using CapstoneProject_BE.Constants;
 using CapstoneProject_BE.DTO;
 using CapstoneProject_BE.Helper;
 using CapstoneProject_BE.Models;
@@ -97,7 +98,7 @@ namespace CapstoneProject_BE.Controllers.Admin
                 {
                     result = await _context.Users.SingleOrDefaultAsync(x => x.UserId == p.UserId);
                 }
-                if (result != null && result.Status)
+                if (result != null && result.Status &&Constant.validateGuidRegex.IsMatch(result.Password))
                 {
                     result.Password = HashHelper.Encrypt(p.Password, _configuration);
                     await _context.SaveChangesAsync();
@@ -213,7 +214,22 @@ namespace CapstoneProject_BE.Controllers.Admin
                 var user = mapper.Map<User>(u);
                 user.StorageId = storageid;
                 user.Email = null;
-                user.Password =HashHelper.Encrypt("123456789aA@",_configuration);
+                if (u.Password==null)
+                {
+                    user.Password = HashHelper.Encrypt("123456789aA@", _configuration);
+                }
+                else if(Constant.validateGuidRegex.IsMatch(user.Password))
+                {
+                    user.Password = HashHelper.Decrypt(user.Password, _configuration);
+                }
+                else
+                {
+                    return BadRequest("Mật khẩu phải từ 6 đến 32 kí tự có chứa" +
+                        "\n Chữ số" +
+                        "\n Chữ cái" +
+                        "\n Chữ cái hoa" +
+                        "\n Kí tự đặc biệt");
+                }
                 user.Status = true;
                 _context.Add(user);
                 await _context.SaveChangesAsync();

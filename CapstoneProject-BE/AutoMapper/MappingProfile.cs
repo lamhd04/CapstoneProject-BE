@@ -59,10 +59,6 @@ namespace CapstoneProject_BE.AutoMapper
                     ));
             CreateMap<StocktakeDTO, StocktakeNote>();
             CreateMap<StocktakeDetailDTO, StocktakeNoteDetail>()
-                                .ForMember(cdto => cdto.MeasuredUnitId,
-                map => map.MapFrom(
-                    c => c.MeasuredUnitId == 0 ? null : c.MeasuredUnitId
-                    ))
                                 .ForMember(cdto => cdto.AmountDifferential,
                 map => map.MapFrom(
                     c => Math.Abs(c.ActualStock-c.CurrentStock)

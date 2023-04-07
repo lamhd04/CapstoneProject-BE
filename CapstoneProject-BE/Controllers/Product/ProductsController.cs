@@ -185,22 +185,25 @@ namespace CapstoneProject_BE.Controllers.Product
                     }
                     var costdifferential = editProduct.CostPrice - result.CostPrice;
                     var pricedifferential = editProduct.SellingPrice - result.SellingPrice;
-                    var history = new ProductHistory
+                    if (costdifferential != 0 || pricedifferential != 0)
                     {
-                        UserId=uid,
-                        ActionId = 3,
-                        ProductId = editProduct.ProductId,
-                        CostPrice = editProduct.CostPrice,
-                        CostPriceDifferential = costdifferential > 0 ? $"-{costdifferential}" : $"+{costdifferential}",
-                        Price=result.SellingPrice,
-                        PriceDifferential= pricedifferential > 0?$"-{pricedifferential}": $"+{pricedifferential}",
-                        Date=DateTime.Now
-                    };
+                        var history = new ProductHistory
+                        {
+                            UserId = uid,
+                            ActionId = 3,
+                            ProductId = editProduct.ProductId,
+                            CostPrice = editProduct.CostPrice,
+                            CostPriceDifferential = costdifferential > 0 ? $"-{costdifferential}" : $"+{costdifferential}",
+                            Price = result.SellingPrice,
+                            PriceDifferential = pricedifferential > 0 ? $"-{pricedifferential}" : $"+{pricedifferential}",
+                            Date = DateTime.Now
+                        };
+                        _context.Add(history);
+                    }                   
                     foreach (var a in result.MeasuredUnits)
                     {
                         a.SuggestedPrice = (a.MeasuredUnitValue * result.SellingPrice);
                     }
-                    _context.Add(history);
                     _context.Update(result);
                     await _context.SaveChangesAsync();
                     return Ok("Thành công");
