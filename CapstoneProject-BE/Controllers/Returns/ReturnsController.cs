@@ -106,7 +106,7 @@ namespace CapstoneProject_BE.Controllers.Returns
                             {
                                 ProductId=a.ProductId,
                                 ActionCode = result.ReturnsCode,
-                                ActionId=1002,
+                                ActionId=6,
                                 Amount=product.InStock,
                                 AmountDifferential=a.MeasuredUnitId!=null?$"-{a.Amount * a.MeasuredUnit.MeasuredUnitValue}":$"-{a.Amount}",
                                 UserId=userid,
@@ -342,7 +342,7 @@ namespace CapstoneProject_BE.Controllers.Returns
                         {
                             ProductId = a.ProductId,
                             ActionCode = order.ReturnsCode,
-                            ActionId = 1002,
+                            ActionId = 7,
                             Amount=product.InStock,
                             AmountDifferential = a.MeasuredUnitId != null ? $"+{a.Amount * a.MeasuredUnit.MeasuredUnitValue}" : $"+{a.Amount}",
                             UserId = userid,
