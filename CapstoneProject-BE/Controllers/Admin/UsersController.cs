@@ -220,7 +220,7 @@ namespace CapstoneProject_BE.Controllers.Admin
                 }
                 else if(Constant.validateGuidRegex.IsMatch(user.Password))
                 {
-                    user.Password = HashHelper.Decrypt(user.Password, _configuration);
+                    user.Password = HashHelper.Encrypt(user.Password, _configuration);
                 }
                 else
                 {
@@ -240,6 +240,33 @@ namespace CapstoneProject_BE.Controllers.Admin
                 return StatusCode(500);
             }
 
+        }
+        [Authorize]
+        [HttpPost("UploadImage")]
+        public async Task<IActionResult> UploadImage(IFormFile image)
+        {
+            try
+            {
+                var extensions = new List<string> { ".jpg", ".png",".jpeg",".gif",".svg" };
+                if (image.Length > 5000000)
+                    return BadRequest("Kích thước ảnh không được quá 5MB");
+                if (!extensions.Contains<string>(System.IO.Path.GetExtension(image.FileName)))
+                    return BadRequest("Tệp phải là ảnh có 1 trong những định dang jpg, png, jpeg, gif, svg");
+                ImageHelper imagekit = new ImageHelper(_configuration["Imagekit:PublicKey"], _configuration["Imagekit:PrivateKey"], _configuration["Imagekit:UrlEndPoint"]);
+               var url= await imagekit.UploadImageAsync(image, image.FileName);
+                if (url == null)
+                {
+                    return BadRequest("Tải ảnh không thành công");
+                }
+                else
+                { 
+                    return Ok(url);
+                }
+            }
+            catch
+            {
+                return StatusCode(500);
+            }
         }
         [Authorize(Policy = "Owner")]
         [HttpPut("UpdateProfile")]

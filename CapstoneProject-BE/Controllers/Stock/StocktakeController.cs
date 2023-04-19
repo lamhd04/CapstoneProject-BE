@@ -222,7 +222,7 @@ namespace CapstoneProject_BE.Controllers.Stock
             {
                 var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
                 var result = await _context.StocktakeNotes
-                    .Include(x => x.StocktakeNoteDetails).ThenInclude(x => x.Product).ThenInclude(x => x.MeasuredUnits).Include(x => x.UpdatedBy).Include(x => x.CreatedBy)
+                    .Include(x => x.StocktakeNoteDetails).Include(x => x.UpdatedBy).Include(x => x.CreatedBy)
                     .SingleOrDefaultAsync(x => x.StocktakeId == stocktakeid && x.StorageId == storageid);
 
                 if (result != null)

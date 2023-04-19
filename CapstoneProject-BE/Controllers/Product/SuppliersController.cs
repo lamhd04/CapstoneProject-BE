@@ -114,9 +114,9 @@ namespace CapstoneProject_BE.Controllers.Product
                 &&x.StorageId== storageid && (x.Status==status||status==null)).ToListAsync();
                 if (limit > result.Count() && offset >= 0)
                 {
-                    return Ok(new ResponseData<Supplier>
+                    return Ok(new 
                     {
-                        Data = result.Skip(offset).Take(result.Count()).ToList(),
+                        Data = mapper.Map<List<SupplierDTO>>(result.Skip(offset).Take(result.Count())),
                         Offset = offset,
                         Limit = limit,
                         Total = result.Count()
@@ -124,9 +124,9 @@ namespace CapstoneProject_BE.Controllers.Product
                 }
                 else if (offset >= 0)
                 {
-                    return Ok(new ResponseData<Supplier>
+                    return Ok(new 
                     {
-                        Data = result.Skip(offset).Take(limit).ToList(),
+                        Data = mapper.Map<List<SupplierDTO>>(result.Skip(offset).Take(limit)),
                         Offset = offset,
                         Limit = limit,
                         Total = result.Count()

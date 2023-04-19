@@ -41,7 +41,12 @@ namespace CapstoneProject_BE.Models
                 e.HasMany(u => u.ProductHistories)
                 .WithOne(u => u.User)
                 .HasForeignKey(u => u.UserId);
-                e.Property(u => u.Password).IsRequired();
+                e.Property(u => u.Password).IsRequired().HasMaxLength(32);
+                e.Property(u => u.Address).HasMaxLength(250);
+                e.Property(u => u.UserCode).HasMaxLength(24);
+                e.Property(u => u.UserName).HasMaxLength(100);
+                e.Property(u => u.Identity).HasMaxLength(12);
+                e.Property(u => u.Email).HasMaxLength(62);
                 e.Property(u => u.RoleId).HasDefaultValue(0);
                 e.Property(u => u.UserId).UseIdentityColumn();
                 e.Property(u => u.Status).HasDefaultValue(false);
@@ -50,8 +55,8 @@ namespace CapstoneProject_BE.Models
             {
                 e.ToTable("Role");
                 e.HasKey(r => r.RoleId);
-                e.Property(r => r.RoleName).IsRequired();
-                e.Property(u => u.RoleId).UseIdentityColumn();
+                e.Property(r => r.RoleName).IsRequired().HasMaxLength(100);
+                e.Property(u => u.RoleId);
             });
             modelBuilder.Entity<RefreshToken>(e =>
             {
@@ -60,6 +65,8 @@ namespace CapstoneProject_BE.Models
                 e.HasOne(rf => rf.User)
                 .WithOne(u => u.RefreshToken)
                 .HasForeignKey<RefreshToken>(u => u.UserId);
+                e.Property(u => u.Token).HasMaxLength(44);
+                e.Property(u => u.JwtId).HasMaxLength(36);
                 e.Property(u => u.IsRevoked).HasDefaultValue(false);
                 e.Property(u => u.TokenId).UseIdentityColumn();
             });
@@ -70,7 +77,7 @@ namespace CapstoneProject_BE.Models
                 e.HasOne(t => t.User)
                 .WithMany(a => a.EmailTokens)
                 .HasForeignKey(u => u.UserId);
-                e.Property(u => u.Token).IsRequired();
+                e.Property(u => u.Token).IsRequired().HasMaxLength(64);
                 e.Property(u => u.TokenId).UseIdentityColumn();
             });
             modelBuilder.Entity<Category>(e =>
@@ -80,7 +87,8 @@ namespace CapstoneProject_BE.Models
                 e.HasMany(r => r.Products)
                 .WithOne(r => r.Category)
                 .HasForeignKey(r => r.CategoryId);
-                e.Property(u => u.CategoryName).IsRequired();
+                e.Property(u => u.CategoryName).IsRequired().HasMaxLength(100);
+                e.Property(u => u.Description).HasMaxLength(250);
                 e.Property(u => u.CategoryId).UseIdentityColumn();
             });
             modelBuilder.Entity<Supplier>(e =>
@@ -90,18 +98,21 @@ namespace CapstoneProject_BE.Models
                 e.HasMany(r => r.ImportOrders)
 .WithOne(r => r.Supplier)
 .HasForeignKey(r => r.SupplierId).OnDelete(DeleteBehavior.NoAction);
-                e.Property(u => u.SupplierName).IsRequired();
-                e.Property(u => u.SupplierPhone).IsRequired();
-                e.Property(u => u.Ward).IsRequired();
-                e.Property(u => u.City).IsRequired();
-                e.Property(u => u.District).IsRequired();
+                e.Property(u => u.SupplierName).IsRequired().HasMaxLength(100);
+                e.Property(u => u.SupplierPhone).IsRequired().HasMaxLength(15);
+                e.Property(u => u.Ward).IsRequired().HasMaxLength(100);
+                e.Property(u => u.City).IsRequired().HasMaxLength(100);
+                e.Property(u => u.District).IsRequired().HasMaxLength(100);
+                e.Property(u => u.Note).HasMaxLength(250);
+                e.Property(u => u.Address).HasMaxLength(250);
+                e.Property(u => u.SupplierEmail).HasMaxLength(62);
                 e.Property(u => u.SupplierId).UseIdentityColumn();
             });
             modelBuilder.Entity<MeasuredUnit>(e =>
             {
                 e.ToTable("MeasuredUnit");
                 e.HasKey(r => r.MeasuredUnitId);
-                e.Property(u => u.MeasuredUnitName).IsRequired();
+                e.Property(u => u.MeasuredUnitName).IsRequired().HasMaxLength(100);
                 e.Property(u => u.MeasuredUnitValue).IsRequired();
                 e.Property(u => u.MeasuredUnitId).UseIdentityColumn();
             });
@@ -125,6 +136,11 @@ namespace CapstoneProject_BE.Models
                 e.Property(p => p.InStock).HasDefaultValue(0);
                 e.Property(p => p.SellingPrice).HasDefaultValue(0);
                 e.Property(p => p.StockPrice).HasDefaultValue(0);
+                e.Property(u => u.Description).HasMaxLength(250);
+                e.Property(u => u.ProductCode).HasMaxLength(24);
+                e.Property(u => u.Barcode).HasMaxLength(24);
+                e.Property(u => u.DefaultMeasuredUnit).HasMaxLength(100);
+                e.Property(u => u.ProductName).HasMaxLength(100);
                 e.Property(u => u.ProductId).UseIdentityColumn();
             });
 
@@ -143,6 +159,8 @@ namespace CapstoneProject_BE.Models
                 e.Property(u => u.TotalAmount).IsRequired();
                 e.Property(u => u.OtherExpense).HasDefaultValue(0);
                 e.Property(u => u.InDebted).HasDefaultValue(0);
+                e.Property(u => u.Note).HasMaxLength(250);
+                e.Property(u => u.ImportCode).HasMaxLength(50);
                 e.Property(u => u.ImportId).UseIdentityColumn();
             });
             modelBuilder.Entity<ImportOrderDetail>(e =>
@@ -170,6 +188,8 @@ namespace CapstoneProject_BE.Models
                 .HasForeignKey(r => r.UserId);
                 e.Property(u => u.TotalPrice).IsRequired();
                 e.Property(u => u.TotalAmount).IsRequired();
+                e.Property(u => u.Note).HasMaxLength(250);
+                e.Property(u => u.ExportCode).HasMaxLength(50);
                 e.Property(u => u.ExportId).UseIdentityColumn();
             });
             modelBuilder.Entity<ExportOrderDetail>(e =>
@@ -198,12 +218,15 @@ namespace CapstoneProject_BE.Models
                 e.HasOne(r => r.UpdatedBy)
 .WithMany(r => r.UpdatedStocktakeNotes)
 .HasForeignKey(r => r.UpdatedId).OnDelete(DeleteBehavior.NoAction);
+                e.Property(u => u.Note).HasMaxLength(250);
+                e.Property(u => u.StocktakeCode).HasMaxLength(50);
                 e.Property(u => u.StocktakeId).UseIdentityColumn();
             });
             modelBuilder.Entity<StocktakeNoteDetail>(e =>
             {
                 e.ToTable("StocktakeNoteDetail");
                 e.HasKey(r => r.DetailId);
+                e.Property(u => u.Note).HasMaxLength(250);
                 e.Property(u => u.DetailId).UseIdentityColumn();
             });
             modelBuilder.Entity<AvailableForReturns>(e =>
@@ -243,6 +266,8 @@ namespace CapstoneProject_BE.Models
                 e.HasOne(r => r.Supplier)
 .WithMany(r => r.ReturnsOrders)
 .HasForeignKey(r => r.SupplierId).OnDelete(DeleteBehavior.NoAction);
+                e.Property(u => u.Note).HasMaxLength(250);
+                e.Property(u => u.ReturnsCode).HasMaxLength(50);
                 e.Property(u => u.ReturnsId).UseIdentityColumn();
             });
             modelBuilder.Entity<ReturnsOrderDetail>(e =>
@@ -270,6 +295,11 @@ namespace CapstoneProject_BE.Models
                 e.HasOne(r => r.Product)
                 .WithMany(r => r.ProductHistories)
                 .HasForeignKey(r => r.ProductId);
+                e.Property(u => u.Note).HasMaxLength(250);
+                e.Property(u => u.AmountDifferential).HasMaxLength(11);
+                e.Property(u => u.CostPriceDifferential).HasMaxLength(50);
+                e.Property(u => u.PriceDifferential).HasMaxLength(50);
+                e.Property(u => u.ActionCode).HasMaxLength(50);
                 e.Property(u => u.HistoryId).UseIdentityColumn();
             });
             modelBuilder.Entity<ActionType>(e =>
@@ -280,7 +310,9 @@ namespace CapstoneProject_BE.Models
                 .WithOne(r => r.ActionType)
                 .HasForeignKey(r => r.ActionId);
                 e.Property(u => u.Action).IsRequired();
-                e.Property(u => u.ActionId).UseIdentityColumn();
+                e.Property(u => u.Action).HasMaxLength(100);
+                e.Property(u => u.Description).HasMaxLength(250);
+                e.Property(u => u.ActionId);
             });
             modelBuilder.Entity<Storage>(e =>
             {
@@ -307,6 +339,7 @@ namespace CapstoneProject_BE.Models
                 e.HasMany(r => r.StocktakeNotes)
 .WithOne(r => r.Storage)
 .HasForeignKey(r => r.StorageId).OnDelete(DeleteBehavior.NoAction);
+                e.Property(u => u.StorageName).HasMaxLength(100);
                 e.Property(u => u.StorageId).UseIdentityColumn();
             });
         }

@@ -15,6 +15,7 @@ using BitMiracle.LibTiff.Classic;
 using System.IdentityModel.Tokens.Jwt;
 using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.AspNetCore.Authorization;
+using CapstoneProject_BE.Migrations;
 
 namespace CapstoneProject_BE.Controllers.Product
 {
@@ -119,7 +120,14 @@ namespace CapstoneProject_BE.Controllers.Product
                 {
                     var c = mapper.Map<Models.Product>(p);
                     c.Created = DateTime.UtcNow;
-                    c.ProductCode = GenerateProductCode(_context.Products.Count()+1);
+                    if (c.ProductCode == null)
+                    {
+                        c.ProductCode = GenerateProductCode(_context.Products.Count() + 1);
+                    }
+                    else if (_context.Products.SingleOrDefault(x => x.ProductCode == c.ProductCode) != null)
+                    {
+                        return BadRequest("Mã sản phẩm đã tồn tại");
+                    }                  
                     c.StorageId = storageid;
                     if (c.Barcode == null)
                     {
@@ -175,9 +183,12 @@ namespace CapstoneProject_BE.Controllers.Product
                     var result=mapper.Map<Models.Product>(productDTO);
                     result.Created = editProduct.Created;
                     result.StorageId = storageid;
-                    if (result.ProductCode == "")
+                    if (result.ProductCode == null)
                     {
                         result.ProductCode = GenerateProductCode(productDTO.ProductId);
+                    }else if(_context.Products.SingleOrDefault(x => x.ProductCode == result.ProductCode&& x.ProductId!=editProduct.ProductId) != null)
+                    {
+                        return BadRequest("Mã sản phẩm đã tồn tại");
                     }
                     if (result.Barcode == "")
                     {

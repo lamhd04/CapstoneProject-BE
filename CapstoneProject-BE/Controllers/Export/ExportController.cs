@@ -38,7 +38,7 @@ namespace CapstoneProject_BE.Controllers.Export
                     var result = mapper.Map<ExportOrder>(p);
                     if (dbimport.State == 0)
                     {
-                        result.StorageId = 1;
+                        result.StorageId = storageid;
                         result.Created = dbimport.Created;
                         _context.RemoveRange(dbimport.ExportOrderDetails);
                         await _context.SaveChangesAsync();

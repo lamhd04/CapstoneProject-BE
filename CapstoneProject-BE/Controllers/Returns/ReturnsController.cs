@@ -260,13 +260,52 @@ namespace CapstoneProject_BE.Controllers.Returns
             {
                 var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
                 var result = await _context.ReturnsOrders
-                    .Include(x => x.ReturnsOrderDetails).ThenInclude(x => x.Product).ThenInclude(x => x.MeasuredUnits)
-                    .Include(x=>x.Supplier).Include(x=>x.User)
+                    .Include(x => x.ReturnsOrderDetails).ThenInclude(x => x.MeasuredUnit).Include(x => x.Supplier).Include(x => x.User)
                     .SingleOrDefaultAsync(x => x.ReturnsId == returnid && x.StorageId == storageid);
 
                 if (result != null)
                 {
-                    return Ok(result);
+                    return Ok(new
+                    {
+                        ReturnId = result.ReturnsId,
+                        ImportId = result.ImportId,
+                        ExportId = result.ExportId,
+                        SupplierId = result.SupplierId,
+                        UserId = result.UserId,
+                        Created = result.Created,
+                        Imported = result.Imported,
+                        Note = result.Note,
+                        Media = result.Media,
+                        Total = result.Total,
+                        StorageId = result.StorageId,
+                        ReturnsCode = result.ReturnsCode,
+                        State = result.State,
+                        Supplier = result.SupplierId != null ? new
+                        {
+                            SupplierId = result.SupplierId,
+                            SupplierName = result.Supplier.SupplierName,
+                            SupplierPhone = result.Supplier.SupplierPhone
+                        } : null,
+                        User = new
+                        {
+                            UserId = result.UserId,
+                            UserName = result.User.UserName
+                        },
+                        ReturnsOrderDetail = from i in result.ReturnsOrderDetails
+                                             join p in _context.Products.Include(x => x.MeasuredUnits)
+                                             on i.ProductId equals p.ProductId
+                                             select new
+                                             {
+                                                 ReturnsId = i.ReturnsId,
+                                                 ProductId = i.ProductId,
+                                                 Price = i.Price,
+                                                 Amount = i.Amount,
+                                                 DefaultMeasuredUnit = i.Product.DefaultMeasuredUnit,
+                                                 Product = i.Product,
+                                                 MeasuredUnit = i.MeasuredUnit,
+                                                 MeasuredUnitId = i.MeasuredUnitId
+                                             }
+                    });
                 }
                 else
                 {
@@ -285,13 +324,53 @@ namespace CapstoneProject_BE.Controllers.Returns
             {
                 var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
                 var result = await _context.ReturnsOrders
-                    .Include(x => x.ReturnsOrderDetails).ThenInclude(x => x.Product).ThenInclude(x => x.MeasuredUnits)
+                    .Include(x => x.ReturnsOrderDetails).ThenInclude(x=>x.MeasuredUnit)
                     .Include(x => x.Supplier).Include(x => x.User)
                     .SingleOrDefaultAsync(x => x.ReturnsCode == returncode && x.StorageId == storageid);
 
                 if (result != null)
                 {
-                    return Ok(result);
+                    return Ok(new
+                    {
+                        ReturnsId = result.ReturnsId,
+                        ImportId = result.ImportId,
+                        ExportId = result.ExportId,
+                        SupplierId = result.SupplierId,
+                        UserId = result.UserId,
+                        Created = result.Created,
+                        Imported = result.Imported,
+                        Note = result.Note,
+                        Media = result.Media,
+                        Total = result.Total,
+                        StorageId = result.StorageId,
+                        ReturnsCode = result.ReturnsCode,
+                        State = result.State,
+                        Supplier = result.SupplierId != null ? new
+                        {
+                            SupplierId = result.SupplierId,
+                            SupplierName = result.Supplier.SupplierName,
+                            SupplierPhone = result.Supplier.SupplierPhone
+                        } : null,
+                        User = new
+                        {
+                            UserId = result.UserId,
+                            UserName = result.User.UserName
+                        },
+                        ReturnsOrderDetail = from i in result.ReturnsOrderDetails
+                                             join p in _context.Products.Include(x => x.MeasuredUnits)
+                                             on i.ProductId equals p.ProductId
+                                             select new
+                                             {
+                                                 ReturnsId = i.ReturnsId,
+                                                 ProductId = i.ProductId,
+                                                 Price=i.Price,
+                                                 Amount=i.Amount,
+                                                 DefaultMeasuredUnit = p.DefaultMeasuredUnit,
+                                                 Product = p,
+                                                 MeasuredUnit = i.MeasuredUnit,
+                                                 MeasuredUnitId = i.MeasuredUnitId
+                                             }
+                    });
                 }
                 else
                 {
