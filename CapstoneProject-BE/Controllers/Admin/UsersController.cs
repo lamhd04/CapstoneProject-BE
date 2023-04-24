@@ -216,7 +216,7 @@ namespace CapstoneProject_BE.Controllers.Admin
                 user.Email = null;
                 if (u.Password==null)
                 {
-                    user.Password = HashHelper.Encrypt("123456789aA@", _configuration);
+                    user.Password = HashHelper.Encrypt("123456aA@", _configuration);
                 }
                 else if(Constant.validateGuidRegex.IsMatch(user.Password))
                 {
