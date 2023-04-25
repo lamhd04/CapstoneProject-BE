@@ -4,6 +4,7 @@ using CapstoneProject_BE.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CapstoneProject_BE.Migrations
 {
     [DbContext(typeof(InventoryManagementContext))]
-    partial class InventoryManagementContextModelSnapshot : ModelSnapshot
+    [Migration("20230406050107_updateReturnsv5")]
+    partial class updateReturnsv5
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -32,12 +34,10 @@ namespace CapstoneProject_BE.Migrations
 
                     b.Property<string>("Action")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Description")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("ActionId");
 
@@ -85,12 +85,10 @@ namespace CapstoneProject_BE.Migrations
 
                     b.Property<string>("CategoryName")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Description")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("StorageId")
                         .HasColumnType("int");
@@ -124,8 +122,7 @@ namespace CapstoneProject_BE.Migrations
 
                     b.Property<string>("Token")
                         .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("nvarchar(64)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -159,12 +156,10 @@ namespace CapstoneProject_BE.Migrations
 
                     b.Property<string>("ExportCode")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Note")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("State")
                         .HasColumnType("int");
@@ -254,8 +249,7 @@ namespace CapstoneProject_BE.Migrations
 
                     b.Property<string>("ImportCode")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<float>("InDebted")
                         .ValueGeneratedOnAdd()
@@ -263,8 +257,7 @@ namespace CapstoneProject_BE.Migrations
                         .HasDefaultValue(0f);
 
                     b.Property<string>("Note")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<float>("OtherExpense")
                         .ValueGeneratedOnAdd()
@@ -355,8 +348,7 @@ namespace CapstoneProject_BE.Migrations
 
                     b.Property<string>("MeasuredUnitName")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("MeasuredUnitValue")
                         .HasColumnType("int");
@@ -383,8 +375,7 @@ namespace CapstoneProject_BE.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProductId"), 1L, 1);
 
                     b.Property<string>("Barcode")
-                        .HasMaxLength(24)
-                        .HasColumnType("nvarchar(24)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("CategoryId")
                         .IsRequired()
@@ -399,12 +390,10 @@ namespace CapstoneProject_BE.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("DefaultMeasuredUnit")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Description")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Image")
                         .HasColumnType("nvarchar(max)");
@@ -421,13 +410,11 @@ namespace CapstoneProject_BE.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("ProductCode")
-                        .HasMaxLength(24)
-                        .HasColumnType("nvarchar(24)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ProductName")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<float>("SellingPrice")
                         .ValueGeneratedOnAdd()
@@ -469,8 +456,7 @@ namespace CapstoneProject_BE.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("HistoryId"), 1L, 1);
 
                     b.Property<string>("ActionCode")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("ActionId")
                         .HasColumnType("int");
@@ -479,29 +465,28 @@ namespace CapstoneProject_BE.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("AmountDifferential")
-                        .HasMaxLength(11)
-                        .HasColumnType("nvarchar(11)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<float?>("CostPrice")
                         .HasColumnType("real");
 
                     b.Property<string>("CostPriceDifferential")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Note")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OrderCode")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<float?>("Price")
                         .HasColumnType("real");
 
                     b.Property<string>("PriceDifferential")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
@@ -541,13 +526,11 @@ namespace CapstoneProject_BE.Migrations
 
                     b.Property<string>("JwtId")
                         .IsRequired()
-                        .HasMaxLength(36)
-                        .HasColumnType("nvarchar(36)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Token")
                         .IsRequired()
-                        .HasMaxLength(44)
-                        .HasColumnType("nvarchar(44)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -584,13 +567,11 @@ namespace CapstoneProject_BE.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Note")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ReturnsCode")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("State")
                         .HasColumnType("int");
@@ -667,8 +648,7 @@ namespace CapstoneProject_BE.Migrations
 
                     b.Property<string>("RoleName")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("RoleId");
 
@@ -693,16 +673,14 @@ namespace CapstoneProject_BE.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Note")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("State")
                         .HasColumnType("int");
 
                     b.Property<string>("StocktakeCode")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("StorageId")
                         .HasColumnType("int");
@@ -741,9 +719,12 @@ namespace CapstoneProject_BE.Migrations
                     b.Property<int>("CurrentStock")
                         .HasColumnType("int");
 
+                    b.Property<int?>("MeasuredUnitId")
+                        .IsRequired()
+                        .HasColumnType("int");
+
                     b.Property<string>("Note")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
@@ -752,6 +733,8 @@ namespace CapstoneProject_BE.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("DetailId");
+
+                    b.HasIndex("MeasuredUnitId");
 
                     b.HasIndex("ProductId");
 
@@ -770,8 +753,7 @@ namespace CapstoneProject_BE.Migrations
 
                     b.Property<string>("StorageName")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("StorageId");
 
@@ -787,22 +769,18 @@ namespace CapstoneProject_BE.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SupplierId"), 1L, 1);
 
                     b.Property<string>("Address")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("City")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("District")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Note")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("Status")
                         .HasColumnType("bit");
@@ -811,23 +789,19 @@ namespace CapstoneProject_BE.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("SupplierEmail")
-                        .HasMaxLength(62)
-                        .HasColumnType("nvarchar(62)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SupplierName")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SupplierPhone")
                         .IsRequired()
-                        .HasMaxLength(15)
-                        .HasColumnType("nvarchar(15)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Ward")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("SupplierId");
 
@@ -845,30 +819,26 @@ namespace CapstoneProject_BE.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserId"), 1L, 1);
 
                     b.Property<string>("Address")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("BirthDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
-                        .HasMaxLength(62)
-                        .HasColumnType("nvarchar(62)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool?>("Gender")
                         .HasColumnType("bit");
 
                     b.Property<string>("Identity")
-                        .HasMaxLength(12)
-                        .HasColumnType("nvarchar(12)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Image")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Password")
                         .IsRequired()
-                        .HasMaxLength(32)
-                        .HasColumnType("nvarchar(32)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Phone")
                         .HasColumnType("nvarchar(max)");
@@ -887,12 +857,10 @@ namespace CapstoneProject_BE.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("UserCode")
-                        .HasMaxLength(24)
-                        .HasColumnType("nvarchar(24)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserName")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("UserId");
 
@@ -1246,6 +1214,12 @@ namespace CapstoneProject_BE.Migrations
 
             modelBuilder.Entity("CapstoneProject_BE.Models.StocktakeNoteDetail", b =>
                 {
+                    b.HasOne("CapstoneProject_BE.Models.MeasuredUnit", "MeasuredUnit")
+                        .WithMany("StocktakeNoteDetails")
+                        .HasForeignKey("MeasuredUnitId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.HasOne("CapstoneProject_BE.Models.Product", "Product")
                         .WithMany()
                         .HasForeignKey("ProductId")
@@ -1257,6 +1231,8 @@ namespace CapstoneProject_BE.Migrations
                         .HasForeignKey("StocktakeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("MeasuredUnit");
 
                     b.Navigation("Product");
 
@@ -1339,6 +1315,8 @@ namespace CapstoneProject_BE.Migrations
                     b.Navigation("ImportOrderDetails");
 
                     b.Navigation("ReturnsOrderDetails");
+
+                    b.Navigation("StocktakeNoteDetails");
                 });
 
             modelBuilder.Entity("CapstoneProject_BE.Models.Product", b =>

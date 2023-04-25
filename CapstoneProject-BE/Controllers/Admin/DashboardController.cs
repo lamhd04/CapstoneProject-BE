@@ -102,9 +102,10 @@ namespace CapstoneProject_BE.Controllers.Admin
                         {
                             yd.Profit -= a.Total;
                         }
-                        foreach(var a in product)
+                        if(DateTime.Now.Year==year)
+                        foreach (var a in product)
                         {
-                            yd.InventoryValue += (float)(a.InStock * a.CostPrice);
+                                yd.InventoryValue += (float)(a.InStock * a.CostPrice);
                         }
                         yd.Month = i;
                         yd.Year = year;

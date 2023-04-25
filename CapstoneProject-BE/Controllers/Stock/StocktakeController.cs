@@ -102,7 +102,9 @@ namespace CapstoneProject_BE.Controllers.Stock
             {
                 var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
                 var updateid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "UserId").Value);
-                var result = await _context.StocktakeNotes.Include(a => a.StocktakeNoteDetails).ThenInclude(x=>x.MeasuredUnit).SingleOrDefaultAsync(x => x.StocktakeId == stocktakeid&&x.StorageId==storageid);
+                var result = await _context.StocktakeNotes
+                    .Include(x => x.StocktakeNoteDetails)
+                    .SingleOrDefaultAsync(x => x.StocktakeId == stocktakeid && x.StorageId == storageid);
                 if (result != null && result.State == 0)
                 {
                     result.State = 1;
@@ -116,21 +118,11 @@ namespace CapstoneProject_BE.Controllers.Stock
                             ProductId = product.ProductId,
                             ActionId = 5
                         };
-                        int total = 0;
-                        if (detail.MeasuredUnitId != null)
+                        if (product.InStock != detail.ActualStock)
                         {
-                            total = detail.ActualStock * detail.MeasuredUnit.MeasuredUnitValue;
-                            product.InStock = total;
-                        }
-                        else
-                        {
-                            total = detail.ActualStock;
-                        }
-                        if (product.InStock != total)
-                        {
-                            var change = total-product.InStock;
+                            var change = detail.ActualStock-product.InStock;
                             history.AmountDifferential = change<0 ? $"{change}" : $"+{change}";
-                                product.InStock = total;
+                                product.InStock = detail.ActualStock;
                         }
                         else
                         {
@@ -230,7 +222,7 @@ namespace CapstoneProject_BE.Controllers.Stock
             {
                 var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
                 var result = await _context.StocktakeNotes
-                    .Include(x => x.StocktakeNoteDetails).ThenInclude(x => x.Product).ThenInclude(x => x.MeasuredUnits).Include(x => x.UpdatedBy).Include(x => x.CreatedBy)
+                    .Include(x => x.StocktakeNoteDetails).Include(x => x.UpdatedBy).Include(x => x.CreatedBy)
                     .SingleOrDefaultAsync(x => x.StocktakeId == stocktakeid && x.StorageId == storageid);
 
                 if (result != null)
@@ -253,14 +245,12 @@ namespace CapstoneProject_BE.Controllers.Stock
                                              {
                                                  StocktakeId = i.StocktakeId,
                                                  ProductId = i.ProductId,
-                                                 MeasuredUnitId = i.MeasuredUnitId,
                                                  ActualStock = i.ActualStock,
                                                  AmountDifferential = i.AmountDifferential,
                                                  CurrentStock = i.CurrentStock,
                                                  Note=i.Note,
                                                  DefaultMeasuredUnit = p.DefaultMeasuredUnit,
-                                                 Product = p,
-                                                 MeasuredUnit = i.MeasuredUnit
+                                                 Product = p
                                              },
                         Note = result.Note,
                         State = result.State,
@@ -313,14 +303,12 @@ namespace CapstoneProject_BE.Controllers.Stock
                                                {
                                                    StocktakeId = i.StocktakeId,
                                                    ProductId = i.ProductId,
-                                                   MeasuredUnitId = i.MeasuredUnitId,
                                                    ActualStock = i.ActualStock,
                                                    AmountDifferential = i.AmountDifferential,
                                                    CurrentStock = i.CurrentStock,
                                                    Note = i.Note,
                                                    DefaultMeasuredUnit = p.DefaultMeasuredUnit,
-                                                   Product = p,
-                                                   MeasuredUnit = i.MeasuredUnit
+                                                   Product = p
                                                },
                         Note = result.Note,
                         State = result.State,

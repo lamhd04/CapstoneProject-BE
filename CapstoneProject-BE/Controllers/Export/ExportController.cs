@@ -38,7 +38,7 @@ namespace CapstoneProject_BE.Controllers.Export
                     var result = mapper.Map<ExportOrder>(p);
                     if (dbimport.State == 0)
                     {
-                        result.StorageId = 1;
+                        result.StorageId = storageid;
                         result.Created = dbimport.Created;
                         _context.RemoveRange(dbimport.ExportOrderDetails);
                         await _context.SaveChangesAsync();
@@ -75,7 +75,7 @@ namespace CapstoneProject_BE.Controllers.Export
                     result.Created = DateTime.Now;
                     result.State = 0;
                     var code = _context.ExportOrders.Where(x => x.StorageId == storageid).Count() + 1;
-                    result.ExportCode ="XAHA"+code;
+                    result.ExportCode ="XUHA"+code;
                     result.StorageId = storageid;
                     _context.Add(result);
                     await _context.SaveChangesAsync();

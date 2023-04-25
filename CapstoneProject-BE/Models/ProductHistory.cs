@@ -7,7 +7,6 @@ namespace CapstoneProject_BE.Models
         public int HistoryId { get; set; }
         public int ProductId { get; set; }
         public int UserId { get; set; }
-        public string? OrderCode { get; set; }
         public int ActionId { get; set; }
         public string? ActionCode { get; set; }
         public DateTime Date { get; set; }

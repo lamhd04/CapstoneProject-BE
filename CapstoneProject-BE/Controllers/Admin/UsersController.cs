@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using CapstoneProject_BE.AutoMapper;
+using CapstoneProject_BE.Constants;
 using CapstoneProject_BE.DTO;
 using CapstoneProject_BE.Helper;
 using CapstoneProject_BE.Models;
@@ -97,7 +98,7 @@ namespace CapstoneProject_BE.Controllers.Admin
                 {
                     result = await _context.Users.SingleOrDefaultAsync(x => x.UserId == p.UserId);
                 }
-                if (result != null && result.Status)
+                if (result != null && result.Status &&Constant.validateGuidRegex.IsMatch(result.Password))
                 {
                     result.Password = HashHelper.Encrypt(p.Password, _configuration);
                     await _context.SaveChangesAsync();
@@ -213,7 +214,22 @@ namespace CapstoneProject_BE.Controllers.Admin
                 var user = mapper.Map<User>(u);
                 user.StorageId = storageid;
                 user.Email = null;
-                user.Password =HashHelper.Encrypt("123456789aA@",_configuration);
+                if (u.Password==null)
+                {
+                    user.Password = HashHelper.Encrypt("123456aA@", _configuration);
+                }
+                else if(Constant.validateGuidRegex.IsMatch(user.Password))
+                {
+                    user.Password = HashHelper.Encrypt(user.Password, _configuration);
+                }
+                else
+                {
+                    return BadRequest("Mật khẩu phải từ 6 đến 32 kí tự có chứa" +
+                        "\n Chữ số" +
+                        "\n Chữ cái" +
+                        "\n Chữ cái hoa" +
+                        "\n Kí tự đặc biệt");
+                }
                 user.Status = true;
                 _context.Add(user);
                 await _context.SaveChangesAsync();
@@ -224,6 +240,33 @@ namespace CapstoneProject_BE.Controllers.Admin
                 return StatusCode(500);
             }
 
+        }
+        [Authorize]
+        [HttpPost("UploadImage")]
+        public async Task<IActionResult> UploadImage(IFormFile image)
+        {
+            try
+            {
+                var extensions = new List<string> { ".jpg", ".png",".jpeg",".gif",".svg" };
+                if (image.Length > 5000000)
+                    return BadRequest("Kích thước ảnh không được quá 5MB");
+                if (!extensions.Contains<string>(System.IO.Path.GetExtension(image.FileName)))
+                    return BadRequest("Tệp phải là ảnh có 1 trong những định dang jpg, png, jpeg, gif, svg");
+                ImageHelper imagekit = new ImageHelper(_configuration["Imagekit:PublicKey"], _configuration["Imagekit:PrivateKey"], _configuration["Imagekit:UrlEndPoint"]);
+               var url= await imagekit.UploadImageAsync(image, image.FileName);
+                if (url == null)
+                {
+                    return BadRequest("Tải ảnh không thành công");
+                }
+                else
+                { 
+                    return Ok(url);
+                }
+            }
+            catch
+            {
+                return StatusCode(500);
+            }
         }
         [Authorize(Policy = "Owner")]
         [HttpPut("UpdateProfile")]

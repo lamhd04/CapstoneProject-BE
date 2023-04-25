@@ -47,7 +47,6 @@ namespace CapstoneProject_BE.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     StocktakeId = table.Column<int>(type: "int", nullable: false),
                     ProductId = table.Column<int>(type: "int", nullable: false),
-                    MeasuredUnitId = table.Column<int>(type: "int", nullable: true),
                     CurrentStock = table.Column<int>(type: "int", nullable: false),
                     ActualStock = table.Column<int>(type: "int", nullable: false),
                     AmountDifferential = table.Column<int>(type: "int", nullable: false),
@@ -56,11 +55,6 @@ namespace CapstoneProject_BE.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_StocktakeNoteDetail", x => x.DetailId);
-                    table.ForeignKey(
-                        name: "FK_StocktakeNoteDetail_MeasuredUnit_MeasuredUnitId",
-                        column: x => x.MeasuredUnitId,
-                        principalTable: "MeasuredUnit",
-                        principalColumn: "MeasuredUnitId");
                     table.ForeignKey(
                         name: "FK_StocktakeNoteDetail_Product_ProductId",
                         column: x => x.ProductId,
@@ -85,10 +79,6 @@ namespace CapstoneProject_BE.Migrations
                 table: "StocktakeNote",
                 column: "UserId");
 
-            migrationBuilder.CreateIndex(
-                name: "IX_StocktakeNoteDetail_MeasuredUnitId",
-                table: "StocktakeNoteDetail",
-                column: "MeasuredUnitId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_StocktakeNoteDetail_ProductId",
