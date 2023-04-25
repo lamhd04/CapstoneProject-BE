@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32825.248
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CapstoneProject-BE", "CapstoneProject-BE\CapstoneProject-BE.csproj", "{56546A2F-71BB-4F60-8C98-30AA524168CA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CapstoneProject-BE", "CapstoneProject-BE\CapstoneProject-BE.csproj", "{56546A2F-71BB-4F60-8C98-30AA524168CA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.CapstoneProject-BE", "Test.CapstoneProject-BE\Test.CapstoneProject-BE.csproj", "{48188254-8D0B-482E-8839-7DEE6DC2013B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{56546A2F-71BB-4F60-8C98-30AA524168CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{56546A2F-71BB-4F60-8C98-30AA524168CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{56546A2F-71BB-4F60-8C98-30AA524168CA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{48188254-8D0B-482E-8839-7DEE6DC2013B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{48188254-8D0B-482E-8839-7DEE6DC2013B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{48188254-8D0B-482E-8839-7DEE6DC2013B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{48188254-8D0B-482E-8839-7DEE6DC2013B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
