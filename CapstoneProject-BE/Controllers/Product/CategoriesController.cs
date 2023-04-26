@@ -107,7 +107,7 @@ namespace CapstoneProject_BE.Controllers.Product
                 var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
                 var result = await _context.Categories
                     .Where(x =>x.CategoryName.Contains(search)
-                &&x.StorageId==storageid).ToListAsync();
+                &&x.StorageId==storageid).OrderByDescending(x=>x.CategoryId).ToListAsync();
                 if (limit > result.Count() && offset >= 0)
                 {
                     return Ok(new ResponseData<Category>

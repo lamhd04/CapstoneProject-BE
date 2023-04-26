@@ -111,7 +111,7 @@ namespace CapstoneProject_BE.Controllers.Product
                 var storageid = Int32.Parse(User.Claims.SingleOrDefault(x => x.Type == "StorageId").Value);
                 var result = await _context.Suppliers
                     .Where(x => (x.SupplierName.Contains(search)||x.SupplierPhone.Contains(search))
-                &&x.StorageId== storageid && (x.Status==status||status==null)).ToListAsync();
+                &&x.StorageId== storageid && (x.Status==status||status==null)).OrderByDescending(x=>x.SupplierId).ToListAsync();
                 if (limit > result.Count() && offset >= 0)
                 {
                     return Ok(new 
